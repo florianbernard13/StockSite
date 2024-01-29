@@ -40,6 +40,11 @@ Site.prototype.SubmitForm = function(){
 	this.GetQuote();
 }
 
+Site.prototype.SubmitSelect = function(){
+	this.symbol = $("#symbolSelect").val();
+	this.GetQuote();
+}
+
 Site.prototype.LoadChart = function(quote){
 
 	var that = this;
