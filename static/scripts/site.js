@@ -1,5 +1,6 @@
 var Site = function(){
 	this.symbol = "MSFT";
+	this.title = null;
 };
 
 Site.prototype.Init = function(){
@@ -22,7 +23,7 @@ Site.prototype.GetQuote = function(){
 
 		// set up a data context for just what we need.
 		var context = {};
-		context.shortName = data.shortName;
+		that.title = context.shortName = data.shortName;
 		context.symbol = data.symbol;
 		context.price = data.ask;
 
