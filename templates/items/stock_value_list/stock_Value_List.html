@@ -1,9 +1,15 @@
 <div>
   <p>Stock Symbols</p>
   <select id="symbolSelect" class="form-select" multiple aria-label="multiple select example" onclick="site.SubmitSelect();">
-    <option value="MC.PA">LVMH</option>
+    <form class="form-inline"></form>
+      <option value="MC.PA">LVMH</option>
+      <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </form>
     <option value="BNP.PA">BNP</option>
     <option value="WLN.PA">Worldline</option>
   </select>
+  {% include 'items/stock_value_list/stock_Value_List_Selection.html' %}
   <script type="module" src="{{ url_for('static',    filename='scripts/stock_Value_List.js') }}"></script>
 </div>

@@ -1,0 +1,11 @@
+@startuml
+:Init;
+-> set initial values;
+while (search lauched) is (yes)
+    :SubmitForm;
+    -> set new values; 
+endwhile (no)
+    :GetQuote;
+    :SaveValueToList;
+    :LoadChart;
+@enduml
