@@ -33,7 +33,9 @@ Site.prototype.GetQuote = function(){
 
 		// call the request to load the chart and pass the data context with it.
 		that.LoadChart(context);
-		that.SaveValueToList();
+		if(swbi){
+			swbi.cpnt_swbi_save_value_to_list(that);
+		}
 	});
 };
 
