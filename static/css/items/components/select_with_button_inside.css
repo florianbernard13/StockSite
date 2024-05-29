@@ -1,0 +1,24 @@
+.cpnt-select-with-button{
+    background-color: white;
+    color: black;
+    max-height: 300px;
+    overflow: auto;
+    padding-right: 10px;
+}
+.cpnt-select-with-button option.selected{
+    background-color: gray;
+}
+
+.cpnt-select-with-button button{
+    scale: 75%;
+    float: right;
+    margin-top: -3px;
+}
+
+.cpnt-select-with-button option{
+    margin-bottom: 2px;
+}
+
+.cpnt-select-with-button button.favorited{
+    color: aqua;
+}

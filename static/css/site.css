@@ -110,6 +110,10 @@ body {
   border-bottom-color: #fff;
 }
 
+select{
+  height: 100%;
+}
+
 @media (min-width: 48em) {
   .masthead-brand {
     float: left;

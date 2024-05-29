@@ -24,8 +24,24 @@
           {% include 'items/main_Dash_Board.html' %}
         </div>
         <div class="col align-self-center">
-          {% include 'items/stock_value_list/stock_Value_List.html' %}
         </div>
+      </div>
+      <div class="row flex-xl-nowrap" style="height: 400px;">
+        <div class="col">
+        </div>
+        <div class="col-xl-6">
+          <div id="chart_container"></div>
+        </div>
+        <div class="col align-self-center" style="height: inherit;">
+          <div class="row h-100">
+            <p class="w-100">Stock Symbols</p>
+            <!-- <div class="w-100 h-75">{% include 'items/stock_value_list/stock_Value_List.html' %}</div> -->
+            <div class="w-100 h-75">{% include 'items/components/select_with_button_inside.html' %}</div>
+            <div class="w-100">{% include 'items/stock_value_list/stock_Value_List_Selection.html' %}
+            <script type="module" src="{{ url_for('static',    filename='scripts/stock_Value_List.js') }}"></script></div>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>

@@ -1,0 +1,41 @@
+<link href="{{ url_for('static',    filename='css/' + self._TemplateReference__context.name[:-4] + 'css') }}" rel="stylesheet">
+<script src="{{ url_for('static',    filename='scripts/' + self._TemplateReference__context.name[:-4] + 'js') }}"></script>
+
+<!-- test part -->
+{% set options = [['elem1','value1'],
+['elem2','value2'],
+['elem3','value3'],
+['elem4','value4'],
+['elem5','value5'],
+['elem6','value6'],
+['elem7','value7'],
+['elem8','value8'],
+['elem9','value9'],
+['elem10','value10'],
+['elem11','value11'],
+['elem12','value12'],
+['elem13','value13'],
+['elem14','value14'],
+['elem15','value15'],
+['elem16','value16'],
+['elem17','value17'],
+['elem18','value18'],
+['elem19','value19'],
+['elem20','value20']] %}
+
+<script>var swbi = new Swbi();</script>
+<!-- end of test part -->
+
+<div id=symbolSelect class="cpnt-select-with-button">
+    {% for option in options %}
+        <option onclick=swbi.cpnt_swbi_on_click(this) value= {{ option[1] }} >
+            {{ option[0] }}
+            <button onclick=swbi.cpnt_swbi_delete(this) class="delete-button">
+                x
+            </button>
+            <button onclick=swbi.cpnt_swbi_add_to_favorite(this) class="favorite-button">
+                ♥
+            </button>
+        </option>
+    {% endfor %}
+</div>
