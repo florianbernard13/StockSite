@@ -35,11 +35,18 @@
         <div class="col align-self-center" style="height: inherit;">
           <div class="row h-100">
             <p class="w-100">Stock Symbols</p>
-            <!-- <div class="w-100 h-75">{% include 'items/stock_value_list/stock_Value_List.html' %}</div> -->
             <div class="w-100 h-75">{% include 'items/components/select_with_button_inside.html' %}</div>
-            <div class="w-100">{% include 'items/stock_value_list/stock_Value_List_Selection.html' %}
-            <script type="module" src="{{ url_for('static',    filename='scripts/stock_Value_List.js') }}"></script></div>
+            <div class="w-100">{% include 'items/stock_value_list/stock_Value_List_Selection.html' %}</div>
           </div>
+        </div>
+      </div>
+      <div class="row flex-xl-nowrap">
+        <div class="col">
+        </div>
+        <div class="col-xl-6">
+          {% include 'items/components/data_tools.html' %}
+        </div>
+        <div class="col align-self-center" style="height: inherit;">
         </div>
       </div>
       </div>

@@ -1,6 +1,8 @@
 var Site = function(){
 	this.symbol = "MSFT";
 	this.title = null;
+	this.data = null;
+	this.chart = null;
 };
 
 Site.prototype.Init = function(){
@@ -57,6 +59,7 @@ Site.prototype.LoadChart = function(quote){
 		method: "GET",
 		cache: false
 	}).done(function(data) {
+		that.data = data;
 		that.RenderChart(JSON.parse(data), quote);
 	});
 };
@@ -76,8 +79,9 @@ Site.prototype.RenderChart = function(data, quote){
 			dates.push(dateString);
 		}
 	}
+	console.log(priceData)
 
-	Highcharts.chart('chart_container', {
+	this.chart = Highcharts.chart('chart_container', {
 		title: {
 			text: title
 		},
