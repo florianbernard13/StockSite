@@ -1,8 +1,11 @@
 from flask import Flask, request, render_template, jsonify
 import yfinance as yf
+from blueprints.data_tools.linear_regression import DT_LINEAR_REGRESSION
 
 # instantiate the Flask app.
 app = Flask(__name__)
+
+app.register_blueprint(DT_LINEAR_REGRESSION)
 
 # API Route for pulling the stock quote
 @app.route("/quote")

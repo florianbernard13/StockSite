@@ -38,7 +38,6 @@ Swbi.prototype.cpnt_swbi_save_value_to_list = function(quote){
 
 Swbi.prototype.cpnt_swbi_on_click = function(option){
     site.symbol = option.value;
-    console.log(site.symbol);
 	site.GetQuote();
     this.cpnt_swbi_activate(option);
 }
