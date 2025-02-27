@@ -1,139 +1,140 @@
-var Site = function(){
-	this.symbol = "MSFT";
-	this.title = null;
-	this.data = null;
-	this.chart = null;
-};
+import StockDataFetcher from "./StockDataFetcher.js";
+class Site {
+    constructor() {
+        this.symbol = "VU.PA";
+        this.title = null;
+        this.data = null;
+        this.chart = null;
+    }
 
-Site.prototype.Init = function(){
-	this.GetQuote();
-	$("#symbol").on("click", function(){
-		$(this).val("");
-	});
-};
+    Init() {
+        this.GetQuote();
+        $("#symbol").on("click", function() {
+            $(this).val("");
+        });
+    }
 
-Site.prototype.GetQuote = function(){
-	// store the site context.
-	var that = this;
+    GetQuote() {
+        // store the site context.
+        const that = this;
 
-	// pull the HTTP REquest
-	$.ajax({
-		url: "/quote?symbol=" + that.symbol,
-		method: "GET",
-		cache: false
-	}).done(function(data) {
+        // pull the HTTP request
+        $.ajax({
+            url: "/quote?symbol=" + that.symbol,
+            method: "GET",
+            cache: false
+        }).done(function(data) {
+            // set up a data context for just what we need.
+            const context = {};
+            that.title = context.shortName = data.shortName;
+            context.symbol = data.symbol;
+            context.price = data.ask;
 
-		// set up a data context for just what we need.
-		var context = {};
-		that.title = context.shortName = data.shortName;
-		context.symbol = data.symbol;
-		context.price = data.ask;
+            if (data.quoteType === "MUTUALFUND") {
+                context.price = data.previousClose;
+            }
 
-		if(data.quoteType="MUTUALFUND"){
-			context.price = data.previousClose
-		}
+            // call the request to load the chart and pass the data context with it.
+            that.LoadChart(context);
 
-		// call the request to load the chart and pass the data context with it.
-		that.LoadChart(context);
-		if(swbi){
-			swbi.cpnt_swbi_save_value_to_list(that);
-		}
-	});
-};
+            if (swbi) {
+                swbi.cpnt_swbi_save_value_to_list(that);
+            }
+        });
+    }
 
-Site.prototype.SubmitForm = function(){
-	this.symbol = $("#symbol").val();
-	this.GetQuote();
+    SubmitForm() {
+        this.symbol = $("#symbol").val();
+        this.GetQuote();
+    }
+
+    SubmitSelect() {
+        this.symbol = $("#symbolSelect").val();
+        this.GetQuote();
+    }
+
+    LoadChart(quote) {
+        const that = this;
+        $.ajax({
+            url: "/history?symbol=" + that.symbol,
+            method: "GET",
+            cache: false
+        }).done(function(data) {
+            that.data = data;
+            that.RenderChart(JSON.parse(data), quote);
+        });
+    }
+
+    RenderChart(data, quote) {
+        const priceData = [];
+        const dates = [];
+
+        const title = `${quote.shortName} (${quote.symbol}) - ${numeral(quote.price).format('$0,0.00')}`;
+
+        for (let i in data.Close) {
+            const dt = i.slice(0, i.length - 3);
+            const dateString = moment.unix(dt).format("MM/YY");
+            const close = data.Close[i];
+
+            if (close !== null) {
+                priceData.push(close);
+                dates.push(dateString);
+            }
+        }
+
+        this.chart = Highcharts.chart('chart_container', {
+            title: {
+                text: title
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                }
+            },
+            xAxis: {
+                categories: dates,
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    }
+                },
+                area: {}
+            },
+            series: [{
+                type: 'area',
+                color: '#85bb65',
+                name: 'Price',
+                data: priceData
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 640
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+        });
+    }
 }
 
-Site.prototype.SubmitSelect = function(){
-	this.symbol = $("#symbolSelect").val();
-	this.GetQuote();
-}
+const site = new Site();
 
-Site.prototype.LoadChart = function(quote){
-
-	var that = this;
-	$.ajax({
-		url: "/history?symbol=" + that.symbol,
-		method: "GET",
-		cache: false
-	}).done(function(data) {
-		that.data = data;
-		that.RenderChart(JSON.parse(data), quote);
-	});
-};
-
-Site.prototype.RenderChart = function(data, quote){
-	var priceData = [];
-	var dates = [];
-
-	var title = quote.shortName  + " (" + quote.symbol + ") - " + numeral(quote.price).format('$0,0.00');
-
-	for(var i in data.Close){
-		var dt = i.slice(0,i.length-3);
-		var dateString = moment.unix(dt).format("MM/YY");
-		var close = data.Close[i];
-		if(close != null){
-			priceData.push(data.Close[i]);
-			dates.push(dateString);
-		}
-	}
-	console.log(priceData)
-
-	this.chart = Highcharts.chart('chart_container', {
-		title: {
-			text: title
-		},
-		yAxis: {
-			title: {
-				text: ''
-			}
-		},
-		xAxis: {
-			categories :dates,
-		},
-		legend: {
-			layout: 'vertical',
-			align: 'right',
-			verticalAlign: 'middle'
-		},
-		plotOptions: {
-			series: {
-				label: {
-					connectorAllowed: false
-				}
-			},
-			area: {
-			}
-		},
-		series: [{
-			type: 'area',
-			color: '#85bb65',
-			name: 'Price',
-			data: priceData
-		}],
-		responsive: {
-			rules: [{
-				condition: {
-					maxWidth: 640
-				},
-				chartOptions: {
-					legend: {
-						layout: 'horizontal',
-						align: 'center',
-						verticalAlign: 'bottom'
-					}
-				}
-			}]
-		}
-
-	});
-
-};
-
-var site = new Site();
-
-$(document).ready(()=>{
-	site.Init();
-})
+$(document).ready(() => {
+    // site.Init();
+	let stockDataFetcher = new StockDataFetcher;
+	stockDataFetcher.LoadChart();
+});

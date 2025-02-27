@@ -3,6 +3,7 @@ var Swbi = function(){
 };
 
 Swbi.prototype.cpnt_swbi_activate = function(option){
+    console.log("cpnt_swbi_activate");
     if(this.activated != null){
         this.activated.classList.remove('selected');
     }
@@ -11,10 +12,18 @@ Swbi.prototype.cpnt_swbi_activate = function(option){
 }
 
 Swbi.prototype.cpnt_swbi_add_to_favorite = function(button){
+    // Event.stopPropagation();
+    event.cancelBubble = true;
+    if(event.stopPropagation) event.stopPropagation();
+    console.log("cpnt_swbi_add_to_favorite");
     button.classList.toggle('favorited');
 }
 
 Swbi.prototype.cpnt_swbi_delete = function(button){
+    // Event.stopPropagation();
+    event.cancelBubble = true;
+    if(event.stopPropagation) event.stopPropagation();
+    console.log("cpnt_swbi_delete");
     button.parentElement.remove();
 }
 
@@ -37,6 +46,7 @@ Swbi.prototype.cpnt_swbi_save_value_to_list = function(quote){
 };
 
 Swbi.prototype.cpnt_swbi_on_click = function(option){
+    if(option.classList.contains('selected')) return;
     site.symbol = option.value;
 	site.GetQuote();
     this.cpnt_swbi_activate(option);
