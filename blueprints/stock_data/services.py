@@ -1,4 +1,6 @@
 import yfinance as yf
+import pandas as pd
+from datetime import datetime, timedelta;
 
 def fetch_stock_data(symbol):
     """
@@ -13,9 +15,24 @@ def fetch_stock_data(symbol):
         short_name = stock_info.get("shortName", "N/A")
         price = stock_info.get("ask", stock_info.get("previousClose"))
 
-        history = stock.history(period="5d", interval="1m")
+        last_days_history = stock.history(period="5d", interval="1m")
+        medium_history = stock.history(period="1mo", interval="60m")
+        late_history = stock.history(period="max", interval="1d")
 
-        history_data = history[["Close"]].reset_index().to_dict(orient="records")
+        # Concaténer les différents historiques
+        history = pd.concat([late_history, medium_history, last_days_history])
+
+        # Supprimer les doublons basés sur l'index (les dates)
+        history = history.loc[~history.index.duplicated(keep='last')]
+
+        history["Datetime"] = history.index
+        history_data = history[["Datetime", "Close"]].copy()
+
+        history_data["Datetime"] = history_data["Datetime"].dt.tz_localize(None)  # Supprime le fuseau horaire
+        history_data["Datetime"] = history_data["Datetime"].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        # Convertir en dictionnaire
+        history_data = history_data.to_dict(orient="records")
 
         return {
             "symbol": symbol,
