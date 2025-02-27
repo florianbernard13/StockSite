@@ -1,40 +1,36 @@
 from flask import Flask, request, render_template, jsonify
 import yfinance as yf
+from config import DevelopmentConfig
 from blueprints.data_tools.linear_regression import DT_LINEAR_REGRESSION
+from blueprints.stock_data import stock_data_bp
 
-# instantiate the Flask app.
+# Création de l'application Flask
 app = Flask(__name__)
 
+# Chargement de la configuration
+app.config.from_object(DevelopmentConfig)
+
+# Enregistrement des blueprints
 app.register_blueprint(DT_LINEAR_REGRESSION)
+app.register_blueprint(stock_data_bp, url_prefix="/api")
 
 # API Route for pulling the stock quote
 @app.route("/quote")
 def display_quote():
-	# get a stock ticker symbol from the query string
-	# default to AAPL
+
 	symbol = request.args.get('symbol', default="AAPL")
-
-	# pull the stock quote
 	quote = yf.Ticker(symbol)
-
-	#return the object via the HTTP Response
 	return jsonify(quote.info)
 
-# API route for pulling the stock history
 @app.route("/history")
 def display_history():
-	#get the query string parameters
 	symbol = request.args.get('symbol', default="AAPL")
 	period = request.args.get('period', default="1y")
 	interval = request.args.get('interval', default="1d")
 
-	#pull the quote
 	quote = yf.Ticker(symbol)	
-	#use the quote to pull the historical data from Yahoo finance
 	hist = quote.history(period=period, interval=interval)
-	#convert the historical data to JSON
 	data = hist.to_json()
-	#return the JSON in the HTTP response
 	return data
 
 # This is the / route, or the main landing page route.
