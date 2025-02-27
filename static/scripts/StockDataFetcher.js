@@ -1,4 +1,5 @@
 export default class StockDataFetcher{
+    
     constructor(){
         this.symbol = "VU.PA";
         this.title = null;
@@ -17,32 +18,63 @@ export default class StockDataFetcher{
     }
 
     RenderChart(data) {
-        const priceData = [];
-        const dates = [];
+        const darkTheme = {
+            background: '#1e1e1e',
+            text: '#ffffff',
+            grid: '#444',
+            primary: '#4caf50'
+        };        
+
+        const priceData = data.history.map(item => [Date.parse(item.Datetime), item.Close]);
 
         const title = `${data.shortName} (${data.symbol}) - ${numeral(data.price).format('$0,0.00')}`;
 
-        data.history.forEach(item => {
-            priceData.push(item.Close)
-            dates.push(item.Datetime)
-        });
+        // data.history.forEach(item => {
+        //     priceData.push(item.Close)
+        //     dates.push(Date.parse(item.Datetime))
+        // });
 
         this.chart = Highcharts.chart('chart_container', {
+            chart: {
+                backgroundColor: darkTheme.background,
+                style: {
+                    color: darkTheme.text
+                }
+            },
             title: {
-                text: title
+                text: title,
+                style: {
+                    color: darkTheme.text
+                }
             },
             yAxis: {
                 title: {
-                    text: ''
-                }
+                    text: '',
+                    style: {
+                        color: darkTheme.text
+                    }
+                },
+                gridLineColor: darkTheme.grid
             },
             xAxis: {
-                categories: dates,
+                type: 'datetime',
+                title: {
+                    text: 'Date',
+                    style: {
+                        color: darkTheme.text
+                    }
+                },
+                labels: {
+                    style: {
+                        color: darkTheme.text
+                    }
+                },
+                gridLineColor: darkTheme.grid
             },
             legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle'
+                itemStyle: {
+                    color: darkTheme.text
+                }
             },
             plotOptions: {
                 series: {
@@ -50,11 +82,13 @@ export default class StockDataFetcher{
                         connectorAllowed: false
                     }
                 },
-                area: {}
+                area: {
+                    fillOpacity: 0.4
+                }
             },
             series: [{
                 type: 'area',
-                color: '#85bb65',
+                color: darkTheme.primary,
                 name: 'Price',
                 data: priceData
             }],
@@ -72,6 +106,6 @@ export default class StockDataFetcher{
                     }
                 }]
             }
-        });
+        });        
     }
 }
