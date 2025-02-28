@@ -1,10 +1,25 @@
 export default class StockDataFetcher{
     
-    constructor(){
-        this.symbol = "VU.PA";
+    constructor(defaultSymbol){
+        this.symbol = defaultSymbol;
         this.title = null;
         this.data = null;
         this.chart = null;
+
+        this.searchInit();
+    }
+
+    
+    // Méthode d'initialisation pour la recherche de symbole
+    searchInit() {
+        const form = document.getElementById('stockSearchForm');
+        if (form) {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.symbol = $("#symbol").val();
+                this.LoadChart();
+            });
+        }
     }
 
     LoadChart() {
@@ -28,11 +43,6 @@ export default class StockDataFetcher{
         const priceData = data.history.map(item => [Date.parse(item.Datetime), item.Close]);
 
         const title = `${data.shortName} (${data.symbol}) - ${numeral(data.price).format('$0,0.00')}`;
-
-        // data.history.forEach(item => {
-        //     priceData.push(item.Close)
-        //     dates.push(Date.parse(item.Datetime))
-        // });
 
         this.chart = Highcharts.chart('chart_container', {
             chart: {
