@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services import fetch_stock_data
+from .services import fetch_stock_data, get_last_days_stock_data
 from . import stock_data_bp
 
 @stock_data_bp.route("/stock_data")
@@ -13,5 +13,18 @@ def get_stock_data():
 
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
+
+    return jsonify(data)
+
+@stock_data_bp.route("/stock_data/last_days/<int:days>")
+def get_last_days(days):
+    """
+    Retourne les données des X derniers jours stockées en cache, où X est spécifié dans l'URL.
+    """
+    symbol = request.args.get("symbol", "AAPL")  # Récupérer le symbole via le paramètre de la requête
+    data = get_last_days_stock_data(symbol, days=days)  # Appeler la fonction en passant le nombre de jours
+
+    if not data:
+        return jsonify({"error": "Données non disponibles en cache"}), 404
 
     return jsonify(data)

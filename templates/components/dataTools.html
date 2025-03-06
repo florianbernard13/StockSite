@@ -1,6 +1,11 @@
 <link href="{{ url_for('static',    filename='css/' + self._TemplateReference__context.name[:-4] + 'css') }}" rel="stylesheet">
-<script src="{{ url_for('static',    filename='scripts/' + self._TemplateReference__context.name[:-4] + 'js') }}"></script>
 
 <button onclick=linear_regression_toggle()>
     ↓
+</button>
+<button id="last5Days" class="two-state-button inactive">
+    5d
+</button>
+<button id="last15Days" class="two-state-button inactive">
+    15d
 </button>
