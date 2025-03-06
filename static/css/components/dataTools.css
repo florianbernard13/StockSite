@@ -1,0 +1,17 @@
+.two-state-button {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+/* Appliquer le style en fonction de l'état */
+.two-state-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.two-state-button.inactive {
+    background-color: #ccc;
+    color: black;
+}

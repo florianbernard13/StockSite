@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, jsonify
 import yfinance as yf
 from config import DevelopmentConfig
-from blueprints.data_tools.linear_regression import DT_LINEAR_REGRESSION
 from blueprints.stock_data import stock_data_bp
+from blueprints.data_tools import data_tools_bp
 
 # Création de l'application Flask
 app = Flask(__name__)
@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
 # Enregistrement des blueprints
-app.register_blueprint(DT_LINEAR_REGRESSION)
+app.register_blueprint(data_tools_bp, url_prefix='/data_tools')
 app.register_blueprint(stock_data_bp, url_prefix="/api")
 
 # API Route for pulling the stock quote
