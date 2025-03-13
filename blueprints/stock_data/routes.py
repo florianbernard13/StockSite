@@ -1,15 +1,19 @@
 from flask import Blueprint, request, jsonify
-from .services import fetch_stock_data, get_last_days_stock_data
+from .services import StockDataFetcher;
 from . import stock_data_bp
+
+stock_service = StockDataFetcher()
 
 @stock_data_bp.route("/stock_data")
 def get_stock_data():
     """
-    Récupère toutes les données de bourse (nom, historique, etc.)
-    avec une granularité à l'heure.
+    Récupère les données boursières pour la période maximale possible (historique complet).
     """
     symbol = request.args.get("symbol", "AAPL")  # Par défaut, Apple
-    data = fetch_stock_data(symbol)  # Appel au service
+    period_str = "max"  # Période maximale
+
+    # Appel de la méthode pour récupérer les données avec la période maximale
+    data = stock_service.get_stock_data_for_period(symbol, period_str)
 
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
@@ -19,12 +23,15 @@ def get_stock_data():
 @stock_data_bp.route("/stock_data/last_days/<int:days>")
 def get_last_days(days):
     """
-    Retourne les données des X derniers jours stockées en cache, où X est spécifié dans l'URL.
+    Retourne les données des X derniers jours stockées en cache.
     """
     symbol = request.args.get("symbol", "AAPL")  # Récupérer le symbole via le paramètre de la requête
-    data = get_last_days_stock_data(symbol, days=days)  # Appeler la fonction en passant le nombre de jours
+    period_str = f"{days}d"  # Crée la chaîne de période, ex : "10d" pour 10 jours
+
+    # Appel de la méthode pour récupérer les données des derniers X jours
+    data = stock_service.get_stock_data_for_period(symbol, period_str)
 
     if not data:
-        return jsonify({"error": "Données non disponibles en cache"}), 404
+        return jsonify({"error": "Données non disponibles"}), 404
 
     return jsonify(data)

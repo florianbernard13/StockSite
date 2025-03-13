@@ -51,28 +51,52 @@ export default class LinearRegression {
         });
     }
 
-    // Fonction pour afficher les résultats (exemple simple, peut être personnalisé)
     displayResults(data) {
         const chart = this.stockDataFetcher.getChart();
         console.log(this.stockDataFetcher);
     
         if (!chart) return;
     
-        // Convertir les timestamps en format utilisable par Highcharts
-        const regressionData = data.regression.map(item => [
-            new Date(item[0]).getTime(),  // Convertir la date en timestamp UNIX
-            item[1]  // Valeur Y
-        ]);
+        // Fonction pour ajouter une série au graphique avec l'option de suivi de la souris
+        const addSeriesToChart = (id, name, data, color, dashStyle, enableMouseTracking = true) => {
+            chart.addSeries({
+                id: id,
+                type: 'line',
+                name: name,
+                data: data,
+                color: color,
+                dashStyle: dashStyle,
+                marker: { enabled: false },
+                tooltip: false,
+                enableMouseTracking: enableMouseTracking,  // Ajouter l'option de suivi de la souris
+            }, true);
+        };
     
-        chart.addSeries({
-            id: 'regressionSeries',
-            type: 'line',
-            name: 'Régression linéaire',
-            data: regressionData,
-            color: '#ff9800',
-            dashStyle: 'Dash',
-            marker: { enabled: false },
-            tooltip: { valueDecimals: 2 }
-        }, true);
+        // Convertir les timestamps en format utilisable par Highcharts
+        const convertToTimestampData = (dataArray) => {
+            return dataArray.map(item => [
+                new Date(item[0]).getTime(),  // Convertir la date en timestamp UNIX
+                item[1]  // Valeur Y
+            ]);
+        };
+    
+        // Ajouter la régression linéaire principale
+        const regressionData = convertToTimestampData(data.regression);
+        addSeriesToChart('regressionSeries', 'Régression linéaire', regressionData, '#ff9800', 'Dash', true);
+    
+        // Définir les bornes avec leurs noms, couleurs, et styles de ligne
+        const boundsConfig = [
+            { key: 'upper_bound_1', name: 'Borne supérieure 1 écart-type', color: '#f44336', dashStyle: 'Dot' },
+            { key: 'lower_bound_1', name: 'Borne inférieure 1 écart-type', color: '#f44336', dashStyle: 'Dot' },
+            { key: 'upper_bound_2', name: 'Borne supérieure 2 écarts-types', color: '#f44336', dashStyle: 'Dot' },
+            { key: 'lower_bound_2', name: 'Borne inférieure 2 écarts-types', color: '#f44336', dashStyle: 'Dot' }
+        ];
+    
+        // Ajouter les séries des bornes supérieures et inférieures
+        boundsConfig.forEach(config => {
+            const boundData = convertToTimestampData(data[config.key]);
+            addSeriesToChart(config.key, config.name, boundData, config.color, config.dashStyle, false);  // Désactiver le suivi de la souris
+        });
     }
+    
 }
