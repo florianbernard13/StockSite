@@ -1,6 +1,7 @@
 import StockStore from "./stores/stockStore.js";
 
 export default class StockDataFetcher {
+    static chart = null;
     
     constructor(defaultSymbol) {
         this.symbol = defaultSymbol || null;
@@ -14,6 +15,14 @@ export default class StockDataFetcher {
         });
     }
 
+    setChart(newChart) {
+        this.chart = newChart;
+    }
+
+    getChart() {
+        return this.chart;
+    }
+
     LoadChart(stock) {
         const apiUri = StockStore.getApiUri();
         $.ajax({
@@ -21,10 +30,13 @@ export default class StockDataFetcher {
             method: "GET",
             cache: false
         }).done((data) => {
+            console.log(data);
             if (data.shortName !== stock.shortName) {
-                StockStore.setStock(data.symbol, data.shortName, null);
+                StockStore.setStock(data.symbol, data.shortName, data.history);
             }
-            this.RenderChart(data);
+            const chart = this.RenderChart(data);
+            console.log("Chart:", chart);
+            this.setChart(chart);
         });
     }
 
@@ -57,7 +69,7 @@ export default class StockDataFetcher {
         const title = `${data.shortName} (${data.symbol}) - ${numeral(data.price).format('$0,0.00')}`;
 
         // Créer le graphique en s'inspirant de l'exemple Highcharts
-        this.chart = Highcharts.stockChart('chart_container', {
+        const chart = Highcharts.stockChart('chart_container', {
             chart: {
                 backgroundColor: darkTheme.background,
                 style: { color: darkTheme.text }
@@ -132,5 +144,6 @@ export default class StockDataFetcher {
                 }]
             }
         });
+        return chart;
     }
 }
