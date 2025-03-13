@@ -84,7 +84,6 @@ def get_last_days_stock_data(symbol, days=5):
 
     # Filtrer les données avant conversion
     history = history[history.index.tz_localize(None) >= cutoff_date]
-    print(history)
 
     # Appliquer la transformation JSON
     stock_cache[symbol]["history_raw"] = history  # On garde en cache

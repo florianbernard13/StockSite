@@ -5,8 +5,8 @@ import DataTools from "./components/dataTools/dataTools.js";
 
 $(document).ready(() => {
     new StockSearch();  // Écoute la recherche
-    new StockDataFetcher();  // Gère le graphique
+    const stockDataFetcher = new StockDataFetcher();  // Gère le graphique
     new SelectWithButtonInside();
-    new DataTools();  // Gère la liste des actions
+    new DataTools(stockDataFetcher);  // Gère la liste des actions
 });
 
