@@ -1,13 +1,14 @@
-// 
+// components/dataTools/dataTools.js
+import FilterLastDays from "./TimesTools/filterLastDays.js";
+import LinearRegression from "./DataAnalysisTools/linearRegression.js";
+import MutuallyExclusiveButtons from "../mutuallyExclusiveButton.js";
 
-import FilterLastDays from "./TimesTools/filterLastDays.js"
-import LinearRegression from "./DataAnalysisTools/linearRegression.js"
-import stockStore from "../../stores/stockStore.js"
+export default class DataTools {
+    constructor(stockDataFetcher) {
+        const mutuallyExclusiveGroup = new MutuallyExclusiveButtons();
 
-export default class DataTools{
-	constructor(stockDataFetcher) {
-		new FilterLastDays(5);
-		new FilterLastDays(15);
-		new LinearRegression(stockDataFetcher);
+        new FilterLastDays(5, mutuallyExclusiveGroup);
+        new FilterLastDays(15, mutuallyExclusiveGroup);
+        new LinearRegression(stockDataFetcher);
     }
 }

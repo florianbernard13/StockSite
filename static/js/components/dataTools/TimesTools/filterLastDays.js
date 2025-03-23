@@ -1,22 +1,34 @@
+import AbstractButton from "../../abstractButton.js";
 import StockStore from "../../../stores/stockStore.js";
 
-export default class FilterLastDays {
-    constructor(days = 5) {
-        this.days = days;  // Nombre de jours à afficher
-        this.lastDaysButton = document.getElementById(`last${days}Days`);
-        if(!this.lastDaysButton) return;
-
-        // Ajout d'un écouteur d'événement sur le bouton
-        this.lastDaysButton.addEventListener("click", () => this.onClick());
+export default class FilterLastDays extends AbstractButton {
+    constructor(days = 5, mutuallyExclusiveGroup = null) {
+        super(`last${days}Days`, {
+            mutuallyExclusive: true,  // Activation du mode mutuellement exclusif
+            mutuallyExclusiveGroup: mutuallyExclusiveGroup,
+        });
+        this.days = days;
     }
 
-    onClick() {
-        this.lastDaysButton.classList.toggle("active");
-        this.lastDaysButton.classList.toggle("inactive");
-        if (this.lastDaysButton.classList.contains("active")) {
-            StockStore.setTimeSpan(`${this.days}d`);
+    toggleState(originallyClickedButton) {
+        if (this.isActive()) {
+            this.onDeactivate(originallyClickedButton);
         } else {
-            StockStore.setTimeSpan(null);
+            this.onActivate(originallyClickedButton);
+        }
+        this.button.classList.toggle("active");
+        this.button.classList.toggle("inactive");
+    }
+
+    onActivate(originallyClickedButton) {
+        if(this === originallyClickedButton) {
+            StockStore.setTimeSpan(`${this.days}d`);
+        }
+    }
+
+    onDeactivate(originallyClickedButton) {
+        if(this === originallyClickedButton) {
+        StockStore.setTimeSpan(null);
         }
     }
 }
