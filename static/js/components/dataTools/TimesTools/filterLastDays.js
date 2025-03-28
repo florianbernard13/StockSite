@@ -23,6 +23,7 @@ export default class FilterLastDays extends AbstractButton {
     onActivate(originallyClickedButton) {
         if(this === originallyClickedButton) {
             StockStore.setTimeSpan(`${this.days}d`);
+
         }
     }
 
