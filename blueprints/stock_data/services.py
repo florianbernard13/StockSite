@@ -1,6 +1,7 @@
-import yfinance as yf
+
 import pandas as pd
 import re
+import yfinance as yf
 from datetime import datetime, timedelta
 
 class StockDataFetcher:
