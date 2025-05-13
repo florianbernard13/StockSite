@@ -1,8 +1,8 @@
-
 import pandas as pd
 import re
-import yfinance as yf
+from stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
+import time
 
 class StockDataFetcher:
     """
@@ -28,7 +28,7 @@ class StockDataFetcher:
             return self.stock_cache[symbol]
         
         try:
-            stock = yf.Ticker(symbol)
+            stock = SafeTicker(symbol)
             stock_info = stock.info
             short_name = stock_info.get("shortName", "N/A")
             price = stock_info.get("ask", stock_info.get("previousClose"))

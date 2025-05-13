@@ -12,6 +12,7 @@ def get_stock_data():
     symbol = request.args.get("symbol", "AAPL")  # Par défaut, Apple
     period_str = "max"  # Période maximale
 
+    print('test')
     # Appel de la méthode pour récupérer les données avec la période maximale
     data = stock_service.get_stock_data_for_period(symbol, period_str)
 
