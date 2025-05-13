@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from stock_data.yfinance_wrapper.safe_ticker import SafeTicker
+# from stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
 import time
 

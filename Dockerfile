@@ -1,6 +1,29 @@
 # Dockerfile
 FROM python:3.11-slim
 
+# Installer OpenJDK 17
+RUN echo "deb http://deb.debian.org/debian buster main" >> /etc/apt/sources.list
+RUN apt-get clean && apt-get update && apt-get upgrade -y
+RUN apt-get install -y ca-certificates-java
+RUN apt-get install -y openjdk-17-jdk
+
+# Installer curl et jq
+RUN apt-get update && apt-get install -y curl jq
+
+# Installer les dépendances nécessaires (curl pour récupérer le package)
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Télécharger et installer la dernière version stable de SonarScanner
+RUN SONAR_SCANNER_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name) \
+    && wget -O sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip \
+    && unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip -d /opt \
+    && ln -s /opt/sonar-scanner-*/bin/sonar-scanner /usr/local/bin/sonar-scanner \
+    && rm sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip
+
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
 
@@ -18,5 +41,5 @@ EXPOSE 5000
 
 # Lancer l'application Flask
 ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-CMD ["flask", "run"]
+ENV FLASK_ENV=development
+CMD ["flask", "run", "--host=0.0.0.0"]

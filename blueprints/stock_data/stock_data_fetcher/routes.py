@@ -1,10 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from .services import StockDataFetcher;
-from . import stock_data_bp
+from . import stock_data_fetcher_bp
 
 stock_service = StockDataFetcher()
 
-@stock_data_bp.route("/stock_data")
+@stock_data_fetcher_bp.route("/stock_data")
 def get_stock_data():
     """
     Récupère les données boursières pour la période maximale possible (historique complet).
@@ -21,7 +21,7 @@ def get_stock_data():
 
     return jsonify(data)
 
-@stock_data_bp.route("/stock_data/last_days/<int:days>")
+@stock_data_fetcher_bp.route("/stock_data/last_days/<int:days>")
 def get_last_days(days):
     """
     Retourne les données des X derniers jours stockées en cache.
