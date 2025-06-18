@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-# from stock_data.yfinance_wrapper.safe_ticker import SafeTicker
+from blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
 import time
 
@@ -29,8 +29,11 @@ class StockDataFetcher:
         
         try:
             stock = SafeTicker(symbol)
+            print('essai3')
             stock_info = stock.info
+            print('essai2')
             short_name = stock_info.get("shortName", "N/A")
+            print('essai1')
             price = stock_info.get("ask", stock_info.get("previousClose"))
 
             # Récupération des historiques aux différentes granularités
@@ -70,6 +73,7 @@ class StockDataFetcher:
 
         num = int(match.group(1))
         unit = match.group(2)
+        print(unit)
 
         if unit in ['d', 'day', 'days']:
             return timedelta(days=num)

@@ -3,19 +3,20 @@ FROM python:3.11-slim
 
 # Installer OpenJDK 17
 RUN echo "deb http://deb.debian.org/debian buster main" >> /etc/apt/sources.list
-RUN apt-get clean && apt-get update && apt-get upgrade -y
-RUN apt-get install -y ca-certificates-java
-RUN apt-get install -y openjdk-17-jdk
 
-# Installer curl et jq
-RUN apt-get update && apt-get install -y curl jq
-
-# Installer les dépendances nécessaires (curl pour récupérer le package)
-RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
+# Mise à jour des paquets système (ca-certificates, openssl, libssl-dev)
+RUN apt-get clean && apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+    ca-certificates \
+    openssl \
+    libssl-dev \
+    ca-certificates-java \
+    openjdk-17-jdk \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    jq \
+    wget \
+    unzip && \
+    rm -rf /var/lib/apt/lists/*
 
 # Télécharger et installer la dernière version stable de SonarScanner
 RUN SONAR_SCANNER_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name) \
@@ -42,4 +43,5 @@ EXPOSE 5000
 # Lancer l'application Flask
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=development
-CMD ["flask", "run", "--host=0.0.0.0"]
+ENV PYTHONUNBUFFERED=1
+CMD ["flask", "run", "--host=0.0.0.0", "--reload"]
