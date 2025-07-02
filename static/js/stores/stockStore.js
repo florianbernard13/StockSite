@@ -31,15 +31,25 @@ class StockStore {
     }
 
     getApiUri() {
-        // Vérifie si 'timeSpan' est valide (ex: "5d", "10d", etc.)
-        const days = parseInt(this.timeSpan, 10);
-    
-        if (!isNaN(days)) {
-            return `/stock_data/last_days/${days}`;
-        }
-    
-        return "/stock_data";
+    if (!this.timeSpan) {
+        // Pas de période spécifiée → récupérer toutes les données (max)
+        return "/stock_data?period=max";
     }
+
+    const regex = /^(\d+)([dmy])$/i;
+    const match = this.timeSpan.match(regex);
+
+    if (match) {
+        const amount = match[1];
+        const unit = match[2].toLowerCase();
+
+        return `/stock_data/last/${amount}${unit}`;
+    }
+
+    // Si format invalide → fallback vers max
+    return "/stock_data?period=max";
+    }
+
 
     getStock() {
         return {

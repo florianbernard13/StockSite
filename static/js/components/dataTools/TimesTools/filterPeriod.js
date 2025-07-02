@@ -5,7 +5,7 @@ export default class FilterPeriod extends AbstractButton {
     /**
      * Crée un bouton de filtre de période.
      * @param {number} value - La quantité de temps (ex: 5).
-     * @param {string} unit - L’unité de temps (ex: "d", "mo", "y").
+     * @param {string} unit - L’unité de temps (ex: "d", "m", "y").
      * @param {string|null} mutuallyExclusiveGroup - Groupe exclusif.
      */
     constructor(value = 5, unit = "d", mutuallyExclusiveGroup = null) {

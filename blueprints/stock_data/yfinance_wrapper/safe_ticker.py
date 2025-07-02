@@ -28,11 +28,9 @@ class SafeTicker:
 
     @property
     def info(self):
-        print(YFINANCE_DELAY)
         time.sleep(YFINANCE_DELAY)
         return self._ticker.info
 
     def history(self, *args, **kwargs):
-        print(YFINANCE_DELAY)
         time.sleep(YFINANCE_DELAY)
         return self._ticker.history(*args, **kwargs)

@@ -70,3 +70,52 @@ class LinearRegressionService:
                 "r_squared": round(self.r_squared, 6)
             }
         }
+
+    def get_last_point_analysis(self):
+        if self.n < 2:
+            return {"error": "Pas assez de données pour une régression linéaire."}
+        self.compute_regression()
+        return self.analyze_last_point()
+
+    def analyze_last_point(self):
+        """
+        Détermine la position du dernier point par rapport aux bandes ±1σ et ±2σ,
+        et calcule le % d'écart si en dessous de -2σ.
+        """
+        last_idx = self.n - 1
+        actual = self.y[last_idx]
+        pred = self.predictions[last_idx]
+        sd = self.std_dev
+
+        # Bornes
+        bnds = {
+            "+2σ": pred + 2*sd,
+            "+1σ": pred + 1*sd,
+            "-1σ": pred - 1*sd,
+            "-2σ": pred - 2*sd,
+        }
+
+        # Détection de la bande
+        if actual > bnds["+2σ"]:
+            band = "above +2σ"
+        elif actual > bnds["+1σ"]:
+            band = "between +1σ and +2σ"
+        elif actual >= bnds["-1σ"]:
+            band = "between -1σ and +1σ"
+        elif actual >= bnds["-2σ"]:
+            band = "between -2σ and -1σ"
+        else:
+            band = "below -2σ"
+
+        # Pourcentage d'écart à –2σ si en dessous
+        pct_diff_to_2sd = None
+        if actual < bnds["-2σ"]:
+            pct_diff_to_2sd = ( (bnds["-2σ"] - actual) / bnds["-2σ"] ) * 100
+
+        return {
+            "last_date": self.x_labels[last_idx],
+            "actual": round(actual, 6),
+            "predicted": round(pred, 6),
+            "band": band,
+            "pct_diff_to_-2σ": round(pct_diff_to_2sd, 2) if pct_diff_to_2sd is not None else None
+        }

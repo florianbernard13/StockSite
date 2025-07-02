@@ -3,9 +3,11 @@ import yfinance as yf
 from config import DevelopmentConfig
 from blueprints.stock_data import stock_data_bp
 from blueprints.data_tools import data_tools_bp
+from blueprints.data_analyzers import data_analyzers_bp
 
 # Création de l'application Flask
 app = Flask(__name__)
+app.jinja_env.cache = {}
 
 # Chargement de la configuration
 app.config.from_object(DevelopmentConfig)
@@ -13,6 +15,7 @@ app.config.from_object(DevelopmentConfig)
 # Enregistrement des blueprints
 app.register_blueprint(data_tools_bp, url_prefix='/data_tools')
 app.register_blueprint(stock_data_bp, url_prefix="/api")
+app.register_blueprint(data_analyzers_bp, url_prefix="/data_analyzers")
 
 # API Route for pulling the stock quote
 @app.route("/quote")

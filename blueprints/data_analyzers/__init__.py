@@ -1,0 +1,6 @@
+from flask import Blueprint
+from .linear_regression_with_std_dev_analyzer import linear_regression_with_std_dev_analyzer_bp
+
+data_analyzers_bp = Blueprint("data_analyzers", __name__)
+
+data_analyzers_bp.register_blueprint(linear_regression_with_std_dev_analyzer_bp, url_prefix='/lr_with_std_dev_analyzer')

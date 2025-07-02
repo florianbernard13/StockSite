@@ -9,8 +9,8 @@ export default class DataTools {
 
         new FilterPeriod(5, 'd', mutuallyExclusiveGroup);
         new FilterPeriod(15, 'd', mutuallyExclusiveGroup);
-        new FilterPeriod(3, 'mo', mutuallyExclusiveGroup);
-        new FilterPeriod(6, 'mo', mutuallyExclusiveGroup);
+        new FilterPeriod(3, 'm', mutuallyExclusiveGroup);
+        new FilterPeriod(6, 'm', mutuallyExclusiveGroup);
         new LinearRegression(stockDataFetcher);
     }
 }

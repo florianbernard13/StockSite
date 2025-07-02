@@ -29,11 +29,8 @@ class StockDataFetcher:
         
         try:
             stock = SafeTicker(symbol)
-            print('essai3')
             stock_info = stock.info
-            print('essai2')
             short_name = stock_info.get("shortName", "N/A")
-            print('essai1')
             price = stock_info.get("ask", stock_info.get("previousClose"))
 
             # Récupération des historiques aux différentes granularités
@@ -57,13 +54,28 @@ class StockDataFetcher:
 
     def parse_period(self, period_str):
         """
-        Parse une chaîne indiquant une période dans un format international.
+        Parse une chaîne indiquant une période dans un format international simple,
+        et retourne un tuple (amount, unit).
+
         Formats supportés :
-          - '10d' ou '10day(s)' pour 10 jours
-          - '1w' ou '1week(s)' pour 1 semaine (7 jours)
-          - '2mo' ou '2month(s)' pour 2 mois (1 mois = 30 jours)
-          - '1y' ou '1year(s)' pour 1 an (1 an = 365 jours)
-        Retourne un timedelta correspondant.
+        - '10d', '10day', '10days' pour 10 jours
+        - '1w', '1week', '1weeks' pour 1 semaine (convertie en jours)
+        - '2m', '2month', '2months' pour 2 mois
+        - '1y', '1year', '1years' pour 1 an
+
+        Unités retournées :
+        - 'd' pour jours (les semaines sont converties en jours)
+        - 'm' pour mois
+        - 'y' pour années
+
+        Exemple d’utilisation :
+        parse_period("15d")  -> (15, 'd')
+        parse_period("3m")  -> (3, 'm')
+        parse_period("1year") -> (1, 'y')
+
+        Retour :
+        - Tuple (int, str) = (nombre, unité normalisée)
+        - None si format invalide ou unité non supportée
         """
         period_str = period_str.strip().lower()
         match = re.match(r"(\d+)\s*([a-z]+)", period_str)
@@ -73,19 +85,25 @@ class StockDataFetcher:
 
         num = int(match.group(1))
         unit = match.group(2)
-        print(unit)
 
+        # Normaliser l’unité aux codes courts d, m, y
         if unit in ['d', 'day', 'days']:
-            return timedelta(days=num)
+            unit = 'd'
         elif unit in ['w', 'week', 'weeks']:
-            return timedelta(days=7 * num)
-        elif unit in ['mo', 'month', 'months']:
-            return timedelta(days=30 * num)
+            # Convertir semaine en jours directement ?
+            # Soit on refuse et on force à utiliser 'd', soit on accepte en 'd' ici
+            unit = 'd'
+            num = num * 7
+        elif unit in ['m', 'month', 'months']:
+            unit = 'm'
         elif unit in ['y', 'year', 'years']:
-            return timedelta(days=365 * num)
+            unit = 'y'
         else:
             print(f"Unité de temps non supportée: {unit}")
             return None
+
+        return num, unit
+
 
     def format_history_json(self, df):
         """
@@ -100,42 +118,57 @@ class StockDataFetcher:
         return df[["Datetime", "Close"]].to_dict(orient="records")
 
     def get_stock_data_for_period(self, symbol, period_str):
-        """
-        Retourne les données boursières pour un symbole, tronquées selon la période demandée.
-        
-        La granularité utilisée est la suivante :
-        - période <= 5 jours : utilise last_days_history (1m)
-        - 5 jours < période <= 1 mois : utilise medium_history (60m)
-        - période > 1 mois : utilise late_history (1d)
-        - 'max' : utilise la granularité complète (historique complet)
-        Les données sont filtrées pour ne conserver que celles dont la date est supérieure à (now - période)
-        et renvoyées sous format JSON.
-        """
-        # Récupération (ou fetch) des données
         data = self.fetch_stock_data(symbol)
         if not data:
             return None
 
-        # Cas spécial pour 'max'
+        histories = (
+            data.get("last_days_history"),
+            data.get("medium_history"),
+            data.get("late_history"),
+        )
+        if all(hasattr(df, "empty") and df.empty for df in histories):
+            print(f"[WARN] No price history at all for {symbol!r}; ignoring this symbol.")
+            return None
+
         if period_str == "max":
             df = data["late_history"].copy()
         else:
-            period_delta = self.parse_period(period_str)
-            if period_delta is None:
+            parsed = self.parse_period(period_str)  # Ex : (5, 'd') ou (2, 'm') ou (1, 'y')
+            if parsed is None:
                 return None
 
+            amount, unit = parsed
             now = datetime.now()
-            cutoff_date = now - period_delta
 
-            # Choix de la granularité en fonction du délai demandé
-            if period_delta <= timedelta(days=5):
+            if unit == 'd':
+                cutoff_date = now - timedelta(days=amount)
+            elif unit == 'm':
+                month = now.month - amount
+                year = now.year
+                while month <= 0:
+                    month += 12
+                    year -= 1
+                cutoff_date = datetime(year, month, 1)
+            elif unit == 'y':
+                cutoff_date = datetime(now.year - amount, 1, 1)
+            else:
+                return None  # unité inconnue
+
+            # Choix granularité selon la durée en jours approximative
+            approx_days = amount
+            if unit == 'm':
+                approx_days = amount * 30
+            elif unit == 'y':
+                approx_days = amount * 365
+
+            if approx_days <= 5:
                 df = data["last_days_history"].copy()
-            elif period_delta <= timedelta(days=30):
+            elif approx_days <= 30:
                 df = data["medium_history"].copy()
             else:
                 df = data["late_history"].copy()
 
-            # Filtrer le DataFrame pour ne garder que les enregistrements après cutoff_date
             df.index = df.index.tz_localize(None)
             df = df[df.index >= cutoff_date]
 
