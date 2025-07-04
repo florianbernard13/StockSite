@@ -25,8 +25,10 @@ export default class StockDataFetcher {
 
     LoadChart(stock) {
         const apiUri = StockStore.getApiUri();
+        const symbolParam = (apiUri.includes("?") ? "&" : "?") + "symbol=" + stock.symbol;
+
         $.ajax({
-            url: "/api" + apiUri + "?symbol=" + stock.symbol,
+            url: "/api" + apiUri + symbolParam,
             method: "GET",
             cache: false
         }).done((data) => {

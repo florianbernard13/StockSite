@@ -8,6 +8,8 @@ from blueprints.data_analyzers import data_analyzers_bp
 # Création de l'application Flask
 app = Flask(__name__)
 app.jinja_env.cache = {}
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
 
 # Chargement de la configuration
 app.config.from_object(DevelopmentConfig)
