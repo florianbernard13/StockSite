@@ -1,0 +1,42 @@
+{% block content %}
+  <h1>Tableau de bord – Régression Linéaire</h1>
+
+  <button id="analyze-all-btn" class="button" aria-label="Analyser toutes les actions">
+    Analyser toutes les actions
+  </button>
+
+  <div style="overflow-x: auto; margin-top: 1rem;">
+    <table class="stock-table" style="
+      width: 100%;
+      background: white;
+      border-radius: 6px;
+      border-collapse: collapse;
+      color: black; /* Texte en noir */
+      font-family: sans-serif;
+    ">
+      <thead>
+        <tr style="background-color: #f5f5f5; color: black;">
+          <th style="padding: 0.75rem; text-align: left;">Nom</th>
+          <th style="padding: 0.75rem; text-align: left;">Écart type</th>
+          <th style="padding: 0.75rem; text-align: left;">Croissance recente</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks_list %}
+          {% set html_id = stock.ticker|lower|replace({'.':'-','/':'-'}) %}
+          <tr id="item-{{ html_id }}" class="stock-item" style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 0.75rem; color: black;">
+              <strong>{{ stock.ticker }}</strong> – {{ stock.name }}
+            </td>
+            <td id="regression-{{ html_id }}" style="padding: 0.75rem; color: black;">
+                {% include 'linearRegression.html' %}
+            </td>
+            <td id="growth-{{ html_id }}" style="padding: 0.75rem; color: black;">
+                {% include 'growthEvolution.html' %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
