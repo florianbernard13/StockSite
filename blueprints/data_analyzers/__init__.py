@@ -1,6 +1,6 @@
 from flask import Blueprint
 from .linear_regressions.standard_deviation import standard_deviation_bp
-from .analysis_dispatcher import analysis_dispatcher_bp
+from .dispatcher import analysis_dispatcher_bp
 
 data_analyzers_bp = Blueprint("data_analyzers", __name__)
 

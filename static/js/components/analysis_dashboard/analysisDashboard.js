@@ -3,7 +3,7 @@ import LinearRegressionAnalyzer from './linearRegressionAnalyzer.js';
 import GrowthEvolutionAnalyzer from './growthEvolutionAnalyzer.js';
 
 export default class AnalysisDashboard {
-    constructor(endpoint = '/data_analyzers/batch') {
+    constructor(endpoint = '/data_analyzers/analysis_dispatcher') {
         this.endpoint = endpoint;
         this.analyzers = [
             new LinearRegressionAnalyzer(),
