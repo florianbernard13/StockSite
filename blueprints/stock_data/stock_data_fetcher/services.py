@@ -169,6 +169,8 @@ class StockDataFetcher:
             else:
                 df = data["late_history"].copy()
 
+            if df.empty:
+                return None
             df.index = df.index.tz_localize(None)
             df = df[df.index >= cutoff_date]
 

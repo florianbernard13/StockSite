@@ -3,12 +3,11 @@ import BaseAnalyzer from './baseAnalyzer.js';
 export default class GrowthEvolutionAnalyzer extends BaseAnalyzer {
   constructor() {
     super('growth');
-    this.type = 'growthEvolution';
+    this.type = 'growth_evolution';
   }
 
-  _renderResult({ recent_growth_pct }) {
+  _renderResult({ amplitude, deltas, deltas_pct, total_delta_pct, instability, volatility, volatility_pct}) {
     // Structure only, fill logic when data available
-    const text = recent_growth_pct != null ? `${recent_growth_pct.toFixed(2)} %` : 'n/a';
-    return `<div><span class="pct">${text}</span></div>`;
-  }
+    return `<div><span class="pct">${total_delta_pct}</span></div>`;
+  } 
 }

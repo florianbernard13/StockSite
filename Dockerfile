@@ -43,4 +43,4 @@ ENV FLASK_ENV=development
 ENV PYTHONUNBUFFERED=1
 
 # Lancer l’application Flask
-CMD ["flask", "run", "--host=0.0.0.0", "--reload"]
+CMD ["flask", "run", "--host=0.0.0.0", "--reload", "--debugger"]

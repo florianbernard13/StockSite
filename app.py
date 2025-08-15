@@ -4,6 +4,7 @@ from config import DevelopmentConfig
 from blueprints.stock_data import stock_data_bp
 from blueprints.data_tools import data_tools_bp
 from blueprints.data_analyzers import data_analyzers_bp
+import logging
 
 # Création de l'application Flask
 app = Flask(__name__)
@@ -11,6 +12,12 @@ app.config['DEBUG'] = True
 app.jinja_env.cache = {}
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
+
+# Configuration globale du logging (à faire une seule fois dans le projet)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 # Chargement de la configuration
 app.config.from_object(DevelopmentConfig)

@@ -6,7 +6,7 @@ from blueprints.data_analyzers.analyzer_registry import register_analyzer
 
 @register_analyzer
 class LinearRegressionWithStdDeviationAnalyzer(BaseAnalyzer):
-    name = "linear_regression_std"
+    analyzer_name = "linear_regression"
     period = "6m"
 
     def analyze(self, history: list[dict]) -> dict:

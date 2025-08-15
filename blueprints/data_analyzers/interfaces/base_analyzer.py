@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 
 class BaseAnalyzer(ABC):
-    name: str
+    analyzer_name: str
     period: str
 
     @abstractmethod
