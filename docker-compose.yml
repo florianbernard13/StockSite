@@ -4,13 +4,16 @@ services:
     build: .
     ports:
       - "5000:5000"
+      - "5173:5173"
     volumes:
       - .:/app
+      - node_modules:/app/node_modules
     environment:
       - FLASK_APP=app.py
       - FLASK_RUN_HOST=0.0.0.0  
       - FLASK_ENV=development
       - FLASK_DEBUG=1
+      - VITE_ENV=development
 
   # Service de la base de données (PostgreSQL pour SonarQube)
   db:
@@ -40,6 +43,7 @@ services:
       - sonar_extensions:/opt/sonarqube/extensions
 
 volumes:
+  node_modules:
   sonar_db_data:
   sonar_data:
   sonar_extensions:
