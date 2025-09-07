@@ -11,7 +11,7 @@ export default class StockSearch {
         if (form) {
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
-                const symbol = $("#symbol").val().trim();
+                const symbol = document.getElementById("symbol").value.trim();
                 if (!symbol) return;
 
                 console.log("Recherche de :", symbol);

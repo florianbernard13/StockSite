@@ -1,4 +1,12 @@
 import StockStore from "./stores/stockStore.js";
+import Highcharts from 'highcharts/highstock.js';
+import ExportingModule from 'highcharts/modules/exporting.js';
+import ExportDataModule from 'highcharts/modules/export-data.js';
+import AccessibilityModule from 'highcharts/modules/accessibility.js';
+
+ExportingModule(Highcharts);
+ExportDataModule(Highcharts);
+AccessibilityModule(Highcharts);
 
 export default class StockDataFetcher {
     static chart = null;
@@ -23,23 +31,34 @@ export default class StockDataFetcher {
         return this.chart;
     }
 
-    LoadChart(stock) {
+    async LoadChart(stock) {
         const apiUri = StockStore.getApiUri();
         const symbolParam = (apiUri.includes("?") ? "&" : "?") + "symbol=" + stock.symbol;
 
-        $.ajax({
-            url: "/api" + apiUri + symbolParam,
-            method: "GET",
-            cache: false
-        }).done((data) => {
+        try {
+            const response = await fetch("/api" + apiUri + symbolParam, {
+                method: "GET",
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Erreur réseau : " + response.status);
+            }
+
+            const data = await response.json();
             console.log(data);
+
             if (data.shortName !== stock.shortName) {
                 StockStore.setStock(data.symbol, data.shortName, data.history);
             }
+
             const chart = this.RenderChart(data);
             console.log("Chart:", chart);
             this.setChart(chart);
-        });
+
+        } catch (err) {
+            console.error("Erreur de chargement du graphique :", err);
+        }
     }
 
     RenderChart(data) {
@@ -68,8 +87,13 @@ export default class StockDataFetcher {
             yAxisMax = maxPrice + (maxPrice - minPrice) * 0.1;
         }
 
-        const title = `${data.shortName} (${data.symbol}) - ${numeral(data.price).format('$0,0.00')}`;
-
+        const priceFormatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        });
+        const title = `${data.shortName} (${data.symbol}) - ${priceFormatter.format(data.price)}`
+        
         // Créer le graphique en s'inspirant de l'exemple Highcharts
         const chart = Highcharts.stockChart('chart_container', {
             chart: {
