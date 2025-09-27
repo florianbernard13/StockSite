@@ -1,4 +1,4 @@
-import StockStore from "./stores/stockStore.js";
+import StockStore from "../js/stores/stockStore";
 
 export default class StockSearch {
     constructor() {

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./frontend/js",
+    "sourceMap": true,
+    "allowJs": true
+  },
+  "include": ["frontend/js/**/*", "frontend/ts/**/*", "frontend/main.ts"],
+  "exclude": ["node_modules", "static"]
+}

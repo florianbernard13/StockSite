@@ -18,37 +18,43 @@ export default class LinearRegression {
         }
     }
 
-    handleRegression() {
+    async handleRegression() {
         if (!this.data) {
             console.error("Pas de données disponibles pour la régression.");
             return;
         }
 
-        this.fetchLinearRegression(this.data).done((regressionData) => {
+        try {
+            const regressionData = await this.fetchLinearRegression(this.data);
             if (regressionData) {
                 console.log("Régression reçue:", regressionData);
                 this.displayResults(regressionData);
             } else {
                 console.error("Erreur dans les données reçues.");
             }
-        }).fail((error) => {
+        } catch (error) {
             console.error("Erreur dans le traitement de la régression:", error);
-        });
+        }
     }
 
-    fetchLinearRegression(data) {
+    async fetchLinearRegression(data) {
         const encodedData = JSON.stringify(data);
         console.log("Données encodées:", encodedData);
-        
+
         const apiUri = "/data_tools/linear_regression/";
 
-        return $.ajax({
-            url: apiUri,
+        const response = await fetch(apiUri, {
             method: "POST",
-            contentType: "application/json",
-            data: encodedData,
-            cache: false
+            headers: { "Content-Type": "application/json" },
+            body: encodedData,
+            cache: "no-store",
         });
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status}`);
+        }
+
+        return await response.json();
     }
 
     displayResults(data) {
