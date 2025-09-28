@@ -1,17 +1,20 @@
 import StockStore from "../js/stores/stockStore";
+import { StockItem } from "./types";
 
 export default class StockSearch {
+    private resultsBox: HTMLElement | null;
     constructor() {
         this.resultsBox = null;
         this.init();
     }
 
-    init() {
-        const form = document.getElementById('stockSearchForm');
+    private init(): void {
+        const form = document.getElementById('stockSearchForm') as HTMLFormElement | null;
         if (form) {
-            form.addEventListener('submit', (event) => {
+            form.addEventListener('submit', (event: Event) => {
                 event.preventDefault();
-                const symbol = document.getElementById("symbol").value.trim();
+                const symbolInput = document.getElementById("symbol") as HTMLInputElement | null
+                const symbol = symbolInput?.value.trim();
                 if (!symbol) return;
 
                 console.log("Recherche de :", symbol);
@@ -23,8 +26,8 @@ export default class StockSearch {
         this.setupAutocomplete();
     }
 
-    setupAutocomplete() {
-        const input = document.getElementById('symbol');
+    private setupAutocomplete(): void {
+        const input = document.getElementById('symbol') as HTMLInputElement | null;
         this.resultsBox = document.getElementById('autocomplete-symbol');
     
         if (!input || !this.resultsBox) return;
@@ -32,13 +35,13 @@ export default class StockSearch {
         input.addEventListener('input', async () => {
             const query = input.value.trim();
             if (query.length < 1) {
-                this.resultsBox.innerHTML = '';
+                this.clearResults();
                 return;
             }
     
             try {
                 const response = await fetch(`/api/stock_search/autocomplete?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
+                const data: StockItem[] = await response.json();
                 this.renderSuggestions(data, input);
             } catch (err) {
                 console.error('Erreur de requête autocomplete :', err);
@@ -46,13 +49,13 @@ export default class StockSearch {
         });
     
         document.addEventListener('click', () => {
-            this.resultsBox.innerHTML = '';
+            this.clearResults();
         });
     }
 
 
-    renderSuggestions(data, input) {
-        this.resultsBox.innerHTML = '';
+    private renderSuggestions(data: StockItem[], input: HTMLInputElement): void {
+        this.clearResults();
 
         data.forEach(item => {
             const option = document.createElement('a');
@@ -63,10 +66,16 @@ export default class StockSearch {
             option.addEventListener('click', e => {
                 e.preventDefault();
                 input.value = item.ticker;
-                this.resultsBox.innerHTML = '';
+                this.clearResults();
             });
 
-            this.resultsBox.appendChild(option);
+            this.resultsBox?.appendChild(option);
         });
+    }
+
+    private clearResults(): void {
+        if (this.resultsBox) {
+            this.resultsBox.innerHTML = '';
+        }
     }
 }

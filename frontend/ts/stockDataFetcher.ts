@@ -1,4 +1,4 @@
-import StockStore from "./stores/stockStore.js";
+import StockStore from "../js/stores/stockStore.js";
 import Highcharts from 'highcharts/highstock.js';
 import ExportingModule from 'highcharts/modules/exporting.js';
 import ExportDataModule from 'highcharts/modules/export-data.js';
