@@ -1,29 +1,35 @@
-export default class BaseAnalyzer {
-    constructor(prefix, label) {
+import { AnalysisResult } from '../../types';
+
+export default abstract class BaseAnalyzer {
+    protected prefix: string;
+    protected label: string;
+    public abstract type: string;
+
+    constructor(prefix: string, label: string) {
         this.prefix = prefix;
         this.label = label;
     }
 
-    addHeaderColumn(theadRow) {
+    public addHeaderColumn(theadRow: HTMLTableRowElement): void {
         const th = document.createElement('th');
         th.textContent = this.label;
         theadRow.appendChild(th);
     }
 
-    addBodyCell(row, slug) {
+    public addBodyCell(row: HTMLTableRowElement, slug: string): void {
         const td = document.createElement('td');
         td.id = `${this.prefix}-${slug}`;
         td.innerHTML = '<span class="loading">En attente…</span>';
         row.appendChild(td);
     }
 
-    initCells() {
-        document.querySelectorAll(`td[id^="${this.prefix}-"]`).forEach(td => {
+    public initCells(): void {
+        document.querySelectorAll<HTMLTableCellElement>(`td[id^="${this.prefix}-"]`).forEach(td => {
             td.innerHTML = '<span class="loading">En attente d’analyse…</span>';
         });
     }
 
-    populateCell(item) {
+    public populateCell(item: AnalysisResult): void {
         const id = this._slugify(item.symbol);
         const cell = document.getElementById(`${this.prefix}-${id}`);
         if (!cell) return;
@@ -38,15 +44,15 @@ export default class BaseAnalyzer {
         }
     }
 
-    _slugify(text) {
+     protected _slugify(text: string): string {
         return text.toLowerCase().replace(/[\.\/]/g, '-');
     }
 
-    _renderError(error) {
+    protected _renderError(error: string): string {
         return `<span class="sigma--error">Erreur : ${error}</span>`;
     }
 
-    _renderResult(analysis) {
+    protected _renderResult(analysis: any): string {
         return '';
     }
 }

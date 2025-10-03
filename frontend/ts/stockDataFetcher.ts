@@ -1,20 +1,24 @@
-import StockStore from "../js/stores/stockStore.js";
-import Highcharts from 'highcharts/highstock.js';
-import ExportingModule from 'highcharts/modules/exporting.js';
-import ExportDataModule from 'highcharts/modules/export-data.js';
-import AccessibilityModule from 'highcharts/modules/accessibility.js';
+import StockStore from "./stores/stockStore";
+import Highcharts, { Chart } from "highcharts/highstock";
+import ExportingModule from "highcharts/modules/exporting";
+import ExportDataModule from "highcharts/modules/export-data";
+import AccessibilityModule from "highcharts/modules/accessibility";
+import { StockEvent, StockData } from "./types";
 
 ExportingModule(Highcharts);
 ExportDataModule(Highcharts);
 AccessibilityModule(Highcharts);
 
 export default class StockDataFetcher {
-    static chart = null;
+    static chart: Chart | null = null;
+
+    private symbol: string | null;
+    private timeSpan: string | null;
     
-    constructor(defaultSymbol) {
+    constructor(defaultSymbol?: string) {
         this.symbol = defaultSymbol || null;
         this.timeSpan = null;
-        StockStore.onUpdate((stock) => {
+        StockStore.onUpdate((stock: StockEvent) => {
             if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan()) return;
             this.symbol = stock.symbol;
             this.timeSpan = StockStore.getTimeSpan();
@@ -23,15 +27,15 @@ export default class StockDataFetcher {
         });
     }
 
-    setChart(newChart) {
-        this.chart = newChart;
+    setChart(newChart: Chart) {
+        StockDataFetcher.chart = newChart;
     }
 
-    getChart() {
-        return this.chart;
+    getChart(): Chart | null {
+        return StockDataFetcher.chart;
     }
 
-    async LoadChart(stock) {
+    async LoadChart(stock: StockEvent): Promise<void>  {
         const apiUri = StockStore.getApiUri();
         const symbolParam = (apiUri.includes("?") ? "&" : "?") + "symbol=" + stock.symbol;
 
@@ -61,7 +65,7 @@ export default class StockDataFetcher {
         }
     }
 
-    RenderChart(data) {
+    RenderChart(data: StockData): Chart {
         const darkTheme = {
             background: '#1e1e1e',
             text: '#ffffff',
@@ -70,7 +74,10 @@ export default class StockDataFetcher {
         };
 
         // Transformer les données en format [timestamp, price]
-        const priceData = data.history.map(item => [Date.parse(item.Datetime), item.Close]);
+        const priceData: [number, number][] = data.history.map(item => [
+            Date.parse(item.Datetime),
+            item.Close
+        ]);
 
         // Calculer le min et le max des prix
         const prices = priceData.map(item => item[1]);
@@ -78,7 +85,7 @@ export default class StockDataFetcher {
         const maxPrice = Math.max(...prices);
 
         // Définir l'intervalle de l'axe Y en fonction de la période
-        let yAxisMin, yAxisMax;
+        let yAxisMin: number, yAxisMax: number;
         if (this.timeSpan === '5d') {
             yAxisMin = Math.max(minPrice - (maxPrice - minPrice) * 0.05, 0);
             yAxisMax = maxPrice + (maxPrice - minPrice) * 0.05;
@@ -94,9 +101,13 @@ export default class StockDataFetcher {
         });
         const title = `${data.shortName} (${data.symbol}) - ${priceFormatter.format(data.price)}`
         
+        const container = document.getElementById('chart_container');
+        if (!container) throw new Error("Chart container not found");
+
         // Créer le graphique en s'inspirant de l'exemple Highcharts
-        const chart = Highcharts.stockChart('chart_container', {
+        const chart = Highcharts.stockChart({
             chart: {
+                renderTo: container,
                 backgroundColor: darkTheme.background,
                 style: { color: darkTheme.text }
             },
@@ -115,7 +126,7 @@ export default class StockDataFetcher {
                     style: { color: darkTheme.text },
                     formatter: function() {
                         // Format de date personnalisé (ex. "Jan 2")
-                        return Highcharts.dateFormat('%b %e', this.value);
+                        return Highcharts.dateFormat('%b %e', this.value as number);
                     }
                 },
                 gridLineColor: darkTheme.grid
@@ -151,8 +162,8 @@ export default class StockDataFetcher {
                 fillColor: {
                     linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                     stops: [
-                        [0, Highcharts.getOptions().colors[0]],
-                        [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        [0, Highcharts.getOptions().colors![0]],
+                        [1, Highcharts.color(Highcharts.getOptions().colors![0]).setOpacity(0).get('rgba')]
                     ]
                 },
                 threshold: null
@@ -169,7 +180,7 @@ export default class StockDataFetcher {
                     }
                 }]
             }
-        });
+        } as Highcharts.Options);
         return chart;
     }
 }

@@ -1,4 +1,4 @@
-import StockStore from "../js/stores/stockStore";
+import StockStore from "./stores/stockStore";
 import { StockItem } from "./types";
 
 export default class StockSearch {
@@ -20,7 +20,7 @@ export default class StockSearch {
                 console.log("Recherche de :", symbol);
 
                 // Mettre à jour le StockStore (cela déclenchera la mise à jour du graphique)
-                StockStore.setStock(symbol, null, null);
+                StockStore.setStock(symbol, undefined, undefined);
             });
         }
         this.setupAutocomplete();

@@ -1,5 +1,11 @@
-export default class AbstractButton {
-    constructor(buttonId, options = {}) {
+import {AbstractButtonOptions} from "../types"
+
+export default abstract class AbstractButton {
+
+    protected button: HTMLElement | null;
+    protected options: AbstractButtonOptions = {};
+
+    constructor(buttonId: string, options: AbstractButtonOptions = {}) {
         this.button = document.getElementById(buttonId);
         if (!this.button) return;
 
@@ -24,17 +30,17 @@ export default class AbstractButton {
         });
     }
 
-    setupMutuallyExclusive() {
+    private setupMutuallyExclusive(): void {
         if (!this.options.mutuallyExclusiveGroup) {
             throw new Error("Un bouton mutuellement exclusif doit avoir un groupe.");
         }
-        this.options.delegateActivation = (button) => {
-            this.options.mutuallyExclusiveGroup.activateButton(button);
+        this.options.delegateActivation = (button: AbstractButton) => {
+            this.options.mutuallyExclusiveGroup!.activateButton(button);
         };
         this.options.mutuallyExclusiveGroup.registerButton(this);
     }
 
-    onClick() {
+    protected onClick(_button: AbstractButton): void {
         // Si delegateActivation est une fonction, on l'appelle
         if (typeof this.options.delegateActivation === 'function') {
             this.options.delegateActivation(this); 
@@ -43,7 +49,9 @@ export default class AbstractButton {
         }
     }
 
-    toggleState() {
+    toggleState(): void {
+        if (!this.button) return;
+
         if (this.isActive()) {
             this.onDeactivate();
         } else {
@@ -53,8 +61,8 @@ export default class AbstractButton {
         this.button.classList.toggle("inactive");
     }
 
-    isActive() {
-        return this.button.classList.contains("active");
+    isActive(): boolean {
+        return this.button?.classList.contains("active") ?? false;
     }
 
     onActivate() {

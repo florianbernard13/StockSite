@@ -1,8 +1,12 @@
-import LinearRegressionAnalyzer from './linearRegressionAnalyzer.js';
-import GrowthEvolutionAnalyzer from './growthEvolutionAnalyzer.js';
+import LinearRegressionAnalyzer from './linearRegressionAnalyzer';
+import GrowthEvolutionAnalyzer from './growthEvolutionAnalyzer';
+import { AnalysisResult } from '../../types';
 
 export default class AnalysisDashboard {
-    constructor(endpoint = '/data_analyzers/analysis_dispatcher') {
+    private endpoint: string;
+    private analyzers: (LinearRegressionAnalyzer | GrowthEvolutionAnalyzer)[];
+
+    constructor(endpoint: string = '/data_analyzers/analysis_dispatcher') {
         this.endpoint = endpoint;
         this.analyzers = [
             new LinearRegressionAnalyzer(),
@@ -11,30 +15,31 @@ export default class AnalysisDashboard {
         this.bindEvents();
     }
 
-    bindEvents() {
+    private bindEvents(): void {
         const btn = document.getElementById('analyze-all-btn');
         if (btn) btn.addEventListener('click', () => this.analyzeAll());
     }
 
-    _slugify(text) {
+    private _slugify(text: string): string {
         return text.toLowerCase().replace(/[\.\/]/g, '-');
     }
 
-    clearTable() {
-        const tbody = document.querySelector('.stock-table tbody');
+    private clearTable(): void {
+        const tbody = document.querySelector<HTMLTableSectionElement>('.stock-table tbody');
         if (tbody) tbody.innerHTML = '';
     }
 
-    createRows(results) {
-        const tbody = document.querySelector('.stock-table tbody');
+
+    private createRows(results: AnalysisResult[]): void {
+        const tbody = document.querySelector<HTMLTableSectionElement>('.stock-table tbody');
         if (!tbody) return;
 
         results.forEach(item => {
-            const symbol = item.symbol || item.symbol?.toString() || '';
+            const symbol = item.symbol || '';
             const name = item.name || '';
 
             const row = document.createElement('tr');
-            row.setAttribute('data-ticker', symbol);
+            row.dataset.ticker = symbol;
 
             const tickerCell = document.createElement('td');
             tickerCell.textContent = name;
@@ -49,8 +54,8 @@ export default class AnalysisDashboard {
         });
     }
 
-    createHeader() {
-        const thead = document.querySelector('.stock-table thead');
+    private createHeader(): void {
+        const thead = document.querySelector<HTMLTableSectionElement>('.stock-table thead');
         if (!thead) return;
 
         thead.innerHTML = '';
@@ -65,7 +70,7 @@ export default class AnalysisDashboard {
         thead.appendChild(row);
     }
 
-    async analyzeAll() {
+    public async analyzeAll(): Promise<void> {
         const analyses = this.analyzers.map(a => a.type);
 
         this.clearTable();
@@ -83,11 +88,13 @@ export default class AnalysisDashboard {
                 throw new Error(message);
             }
 
-            const results = await res.json();
+            const results: AnalysisResult[] = await res.json();
 
             if (!Array.isArray(results) || results.length === 0) {
-                const tbody = document.querySelector('.stock-table tbody');
-                tbody.innerHTML = `<tr><td colspan="${this.analyzers.length + 1}" class="sigma--info">Aucun résultat retourné.</td></tr>`;
+                const tbody = document.querySelector<HTMLTableSectionElement>('.stock-table tbody');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="${this.analyzers.length + 1}" class="sigma--info">Aucun résultat retourné.</td></tr>`;
+                }
                 return;
             }
 
@@ -101,12 +108,14 @@ export default class AnalysisDashboard {
             });
         } catch (err) {
             console.error(err);
-            const tbody = document.querySelector('.stock-table tbody');
-            tbody.innerHTML = `<tr><td colspan="${this.analyzers.length + 1}" class="sigma--error">Erreur réseau lors du chargement.</td></tr>`;
+            const tbody = document.querySelector<HTMLTableSectionElement>('.stock-table tbody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="${this.analyzers.length + 1}" class="sigma--error">Erreur réseau lors du chargement.</td></tr>`;
+            }
         }
     }
 
-    _sortErrorsToEnd(a, b) {
+    private _sortErrorsToEnd(a: AnalysisResult, b: AnalysisResult): number {
         const aErr = !!a.analysis?.error;
         const bErr = !!b.analysis?.error;
         return aErr === bErr ? 0 : aErr ? 1 : -1;

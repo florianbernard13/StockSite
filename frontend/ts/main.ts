@@ -1,9 +1,9 @@
 import 'bootstrap';
 import StockSearch from "./stockSearch";
 import StockDataFetcher from "./stockDataFetcher";
-import SelectWithButtonInside from "../js/components/selectWithButtonInside";
-import DataTools from "../js/components/dataTools/dataTools";
-import AnalysisDashboard from "../js/components/analysis_dashboard/analysisDashboard";
+import SelectWithButtonInside from "./components/selectWithButtonInside";
+import DataTools from "./components/data_tools/dataTools";
+import AnalysisDashboard from "./components/analysis_dashboard/analysisDashboard";
 
 document.addEventListener('DOMContentLoaded', () => {
     new StockSearch();
