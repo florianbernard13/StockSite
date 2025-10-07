@@ -2,7 +2,7 @@ import MutuallyExclusiveButtonGroup from "../../mutuallyExclusiveButtonGroup";
 import AbstractButton from "../../abstractButton";
 import StockStore from "../../../stores/stockStore";
 
-export default class FilterPeriod extends AbstractButton {
+export default class FilterPeriodButton extends AbstractButton {
     value: number;
     unit: string;
 
@@ -27,7 +27,8 @@ export default class FilterPeriod extends AbstractButton {
         this.unit = unit;
     }
 
-    toggleState(originallyClickedButton?: FilterPeriod): void {
+    toggleState(originallyClickedButton?: FilterPeriodButton): void {
+        console.log("Toggle filter button");
         if (!this.button) return;
         if (this.isActive()) {
             this.onDeactivate(originallyClickedButton);
@@ -38,13 +39,15 @@ export default class FilterPeriod extends AbstractButton {
         this.button.classList.toggle("inactive");
     }
 
-    onActivate(originallyClickedButton?: FilterPeriod): void {
+    onActivate(originallyClickedButton?: FilterPeriodButton): void {
+        console.log(this);
+        console.log(originallyClickedButton);
         if (this === originallyClickedButton) {
             StockStore.setTimeSpan(`${this.value}${this.unit}`);
         }
     }
 
-    onDeactivate(originallyClickedButton?: FilterPeriod): void {
+    onDeactivate(originallyClickedButton?: FilterPeriodButton): void {
         if (this === originallyClickedButton) {
             StockStore.setTimeSpan(null);
         }

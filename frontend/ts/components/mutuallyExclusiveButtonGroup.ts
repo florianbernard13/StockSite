@@ -10,9 +10,9 @@ export default class MutuallyExclusiveButtonGroup {
     activateButton(clickedButton: AbstractButton) {
         for (const button of this.buttons) {
             if (button !== clickedButton && button.isActive()) {
-                button.toggleState();
+                button.toggleState(clickedButton);
             }
         }
-        clickedButton.toggleState();
+        clickedButton.toggleState(clickedButton);
     }
 }

@@ -49,7 +49,7 @@ export default abstract class AbstractButton {
         }
     }
 
-    toggleState(): void {
+    toggleState(_originallyClickedButton?: AbstractButton): void {
         if (!this.button) return;
 
         if (this.isActive()) {
