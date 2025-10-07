@@ -1,27 +1,57 @@
 import StockStore from '../../../stores/stockStore';
 import StockDataFetcher from '../../../stockDataFetcher';
-import { RegressionAnalysisResponse, RegressionAnalysisRender } from '../../../types';
+import { RegressionAnalysisResponse, RegressionAnalysisRender, StockEvent } from '../../../types';
 import { DashStyleValue } from 'highcharts';
+import AbstractButton from '../../abstractButton';
 
-export default class LinearRegression {
-    private button: HTMLElement | null;
+export default class LinearRegressionButton extends AbstractButton{
+    private symbol: string | null;
     private stockDataFetcher: StockDataFetcher;
     private data: any;
+    private timeSpan: string | null;
+    private linearRegressionDisplay: boolean;
+    private seriesIds: string[] = [];
+
     
     constructor(stockDataFetcher: StockDataFetcher) {
-        this.button = document.getElementById('linearRegression');
+        const key = `linearRegression-btn`;
+        super(key, {});
         this.stockDataFetcher = stockDataFetcher;
+        this.symbol = null;
+        this.timeSpan = null;
+        this.linearRegressionDisplay = false;
 
-        // S'abonner aux mises à jour de StockStore
-        StockStore.onUpdate((stockData: any) => {
-            this.data = stockData.data; 
+        StockStore.onUpdate((stock: StockEvent) => {
+            if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan() && this.data.length != 0) return;
+            this.symbol = stock.symbol;
+            this.timeSpan = StockStore.getTimeSpan();
+            this.data = stock.history;
+
+            if(!this.linearRegressionDisplay) return;
+            this.handleRegression();
+        });
+    }
+
+    protected onActivate(): void {
+        this.linearRegressionDisplay = true;
+        this.handleRegression();
+    }
+
+    protected onDeactivate(): void {
+        this.linearRegressionDisplay = false;
+        this.removeRegressionSeries();
+    }
+
+    private removeRegressionSeries(): void {
+        const chart = this.stockDataFetcher.getChart();
+        if (!chart) return;
+
+        this.seriesIds.forEach(id => {
+            const series = chart.get(id);
+            if (series) series.remove();
         });
 
-        if (this.button) {
-            this.button.addEventListener('click', () => {
-                this.handleRegression();
-            });
-        }
+        this.seriesIds = [];
     }
 
     async handleRegression(): Promise<void> {
@@ -44,15 +74,18 @@ export default class LinearRegression {
     }
 
     private async fetchLinearRegression(data: any): Promise<RegressionAnalysisResponse> {
-        const encodedData = JSON.stringify(data);
-        console.log("Données encodées:", encodedData);
+       const payload = {
+            data,
+            timeSpan: StockStore.getTimeSpan()
+        };
+        console.log("Données encodées:", payload);
 
         const apiUri = "/data_tools/linear_regression/";
 
         const response = await fetch(apiUri, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: encodedData,
+            body: JSON.stringify(payload),
             cache: "no-store",
         });
 
@@ -84,9 +117,10 @@ export default class LinearRegression {
                 color,
                 dashStyle,
                 marker: { enabled: false },
-                tooltip: {pointFormatter: () => null as any},
                 enableMouseTracking
             }, true);
+
+            this.seriesIds.push(id);
         };
 
     

@@ -37,7 +37,6 @@ export default abstract class BaseAnalyzer {
         if (item.analysis?.error) {
             cell.innerHTML = this._renderError(item.analysis.error);
         } else if (item.analysis?.[this.type]) {
-            console.log(item.analysis[this.type]);
             cell.innerHTML = this._renderResult(item.analysis[this.type]);
         } else {
             cell.innerHTML = this._renderError(`No analysis for type "${this.type}"`);

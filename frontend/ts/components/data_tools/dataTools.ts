@@ -1,5 +1,5 @@
 import FilterPeriodButton from "./times_tools/filterPeriodButton";
-import LinearRegression from "./data_analysis_tools/linearRegression";
+import LinearRegressionButton from "./data_analysis_tools/LinearRegressionButton";
 import MutuallyExclusiveButtonGroup from "../mutuallyExclusiveButtonGroup";
 import StockDataFetcher from "../../stockDataFetcher";
 
@@ -12,6 +12,6 @@ export default class DataTools {
         new FilterPeriodButton(3, 'm', mutuallyExclusiveButtonGroup);
         new FilterPeriodButton(6, 'm', mutuallyExclusiveButtonGroup);
 
-        new LinearRegression(stockDataFetcher);
+        new LinearRegressionButton(stockDataFetcher);
     }
 }

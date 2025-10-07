@@ -17,7 +17,7 @@ export default class FilterPeriodButton extends AbstractButton {
         unit: "d" | "m" | "y" = "d",
         mutuallyExclusiveGroup: MutuallyExclusiveButtonGroup | null = null
     ) {
-        const key = `last${value}${unit.toUpperCase()}`;
+        const key = `last${value}${unit.toUpperCase()}-btn`;
         super(key, {
             mutuallyExclusive: true,
             mutuallyExclusiveGroup,
@@ -27,27 +27,13 @@ export default class FilterPeriodButton extends AbstractButton {
         this.unit = unit;
     }
 
-    toggleState(originallyClickedButton?: FilterPeriodButton): void {
-        console.log("Toggle filter button");
-        if (!this.button) return;
-        if (this.isActive()) {
-            this.onDeactivate(originallyClickedButton);
-        } else {
-            this.onActivate(originallyClickedButton);
-        }
-        this.button.classList.toggle("active");
-        this.button.classList.toggle("inactive");
-    }
-
-    onActivate(originallyClickedButton?: FilterPeriodButton): void {
-        console.log(this);
-        console.log(originallyClickedButton);
+    protected onActivate(originallyClickedButton?: FilterPeriodButton): void {
         if (this === originallyClickedButton) {
             StockStore.setTimeSpan(`${this.value}${this.unit}`);
         }
     }
 
-    onDeactivate(originallyClickedButton?: FilterPeriodButton): void {
+    protected onDeactivate(originallyClickedButton?: FilterPeriodButton): void {
         if (this === originallyClickedButton) {
             StockStore.setTimeSpan(null);
         }

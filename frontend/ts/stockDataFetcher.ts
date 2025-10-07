@@ -50,14 +50,13 @@ export default class StockDataFetcher {
             }
 
             const data = await response.json();
-            console.log(data);
 
             if (data.shortName !== stock.shortName) {
+                //Le nom a déjà été poussé et va trigger la récupération des données qui retriger la notification
                 StockStore.setStock(data.symbol, data.shortName, data.history);
             }
 
             const chart = this.RenderChart(data);
-            console.log("Chart:", chart);
             this.setChart(chart);
 
         } catch (err) {

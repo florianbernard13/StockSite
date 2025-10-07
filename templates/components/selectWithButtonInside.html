@@ -1,4 +1,4 @@
-<link href="{{ url_for('static',    filename='css/' + self._TemplateReference__context.name[:-4] + 'css') }}" rel="stylesheet">
+<link rel="stylesheet" href="{{ vite_asset('css/' + self._TemplateReference__context.name[:-4] + 'css') }}">
 
 <div id=symbolSelect class="cpnt-select-with-button">
     {% for option in options %}

@@ -5,7 +5,13 @@ from . import linear_regression_bp
 @linear_regression_bp.route("/", methods=["POST"])
 def linear_regression():
     try:
-        data = request.get_json()
+        payload = request.get_json()
+
+        if not payload:
+            return jsonify({"error": "Aucun payload JSON fourni."}), 400
+        
+        data = payload.get("data")
+        time_span = payload.get("timeSpan")
 
         if not data:
             return jsonify({"error": "Aucune donnée boursière valide fournie."}), 400
@@ -21,7 +27,7 @@ def linear_regression():
             if "Datetime" not in item:
                 return jsonify({"error": "Chaque élément des données doit contenir la clé 'Datetime'."}), 400
 
-        result = LinearRegressionService(data).get_results()  # Passer directement le dict
+        result = LinearRegressionService(data, time_span).get_results()  # Passer directement le dict
         return jsonify(result)  # jsonify() gère la conversion en JSON
     except Exception as e:
         return jsonify({"error": str(e)}), 500

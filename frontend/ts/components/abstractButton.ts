@@ -49,27 +49,27 @@ export default abstract class AbstractButton {
         }
     }
 
-    toggleState(_originallyClickedButton?: AbstractButton): void {
+    protected toggleState(_originallyClickedButton?: AbstractButton): void {
         if (!this.button) return;
 
         if (this.isActive()) {
-            this.onDeactivate();
+            this.onDeactivate(_originallyClickedButton);
         } else {
-            this.onActivate();
+            this.onActivate(_originallyClickedButton);
         }
         this.button.classList.toggle("active");
         this.button.classList.toggle("inactive");
     }
 
-    isActive(): boolean {
+    public isActive(): boolean {
         return this.button?.classList.contains("active") ?? false;
     }
 
-    onActivate() {
+    protected onActivate(_originallyClickedButton?: AbstractButton) {
         throw new Error("La méthode 'onActivate' doit être implémentée.");
     }
 
-    onDeactivate() {
+    protected onDeactivate(_originallyClickedButton?: AbstractButton) {
         throw new Error("La méthode 'onDeactivate' doit être implémentée.");
     }
 }

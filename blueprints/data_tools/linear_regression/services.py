@@ -1,8 +1,13 @@
 import numpy as np
+from datetime import datetime, timedelta
+from blueprints.stock_data.stock_data_fetcher.services import StockDataFetcher
 
 class LinearRegressionService:
-    def __init__(self, data):
+    def __init__(self, data, time_span=None):
         self.data = data
+        self.time_span = time_span
+        self.data = self._filter_by_time_span(data, time_span) if time_span else data
+
         self.x_labels, self.y = self.extract_data()
         self.n = len(self.y)
         self.x = np.arange(self.n)
@@ -11,6 +16,44 @@ class LinearRegressionService:
         self.predictions = None
         self.std_dev = None
         self.r_squared = None
+
+    def _filter_by_time_span(self, data, time_span):
+        """
+        Filtre les données selon le time_span fourni (ex: '1m', '10d', '1y').
+        Utilise la méthode parse_period() du StockDataFetcher pour l’interprétation.
+        """
+        fetcher = StockDataFetcher()
+        parsed = fetcher.parse_period(time_span)
+        if not parsed:
+            print(f"[WARN] TimeSpan invalide: {time_span}")
+            return data
+
+        amount, unit = parsed
+        now = datetime.now()
+
+        # Calcule la date de coupure
+        if unit == "d":
+            cutoff_date = now - timedelta(days=amount)
+        elif unit == "m":
+            cutoff_date = now - timedelta(days=amount * 30)
+        elif unit == "y":
+            cutoff_date = now - timedelta(days=amount * 365)
+        else:
+            return data
+
+        # Filtrage basé sur la date
+        filtered = []
+        for entry in data:
+            try:
+                dt = datetime.fromisoformat(entry["Datetime"])
+                if dt >= cutoff_date:
+                    filtered.append(entry)
+            except Exception as e:
+                print(f"[WARN] Ligne ignorée ({e}): {entry}")
+                continue
+
+        print(f"[LinearRegressionService] Filtrage '{time_span}': {len(data)} → {len(filtered)} points")
+        return filtered or data  # fallback si trop peu de données
 
     def extract_data(self):
         """Extrait les dates et les valeurs de clôture."""

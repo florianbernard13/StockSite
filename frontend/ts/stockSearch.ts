@@ -19,7 +19,7 @@ export default class StockSearch {
 
                 console.log("Recherche de :", symbol);
 
-                // Mettre à jour le StockStore (cela déclenchera la mise à jour du graphique)
+                // Pousse uniquement le nom de l'action à tous les listeners
                 StockStore.setStock(symbol, undefined, undefined);
             });
         }

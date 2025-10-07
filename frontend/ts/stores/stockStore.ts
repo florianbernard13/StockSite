@@ -68,7 +68,6 @@ class StockStore {
         this.listeners.push(callback);
     }
 
-
     private notifyListeners() {
         const stock = this.getStock();
         if (!stock) return;
