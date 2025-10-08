@@ -2,11 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="A demo site featuring an ajax-based stock widget that uses Python and Flask as a backend microservice API">
-    <meta name="author" content="Shane Larson">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Python and Flask based Stock Widget - Grizzly Peak Software</title>
+    <title>Marchés en direct — Simulation boursière en temps réel</title>
+
+    <meta name="description" content="Découvrez une expérience cinématique interactive de la bourse : suivez l’évolution d’un cours en temps réel avec animations et effets immersifs.">
+    <meta name="author" content="Florian Bernard">
+    <meta name="keywords" content="bourse, marché, trading, simulation, finance, temps réel, Python, Flask, animation, Chart.js">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <!-- Open Graph / Réseaux sociaux -->
+    <meta property="og:title" content="Marchés en direct — Simulation boursière immersive">
+    <meta property="og:description" content="Une expérience interactive de marché boursier animée avec Flask et Chart.js.">
+    <meta property="og:type" content="website">
+    <!-- <meta property="og:url" content="https://ton-site.fr/"> -->
+    <!-- <meta property="og:image" content="https://ton-site.fr/static/preview.jpg"> -->
 
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -14,6 +25,7 @@
           crossorigin="anonymous">
 
     <link rel="stylesheet" href="{{ vite_asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ vite_asset('scss/' + self._TemplateReference__context.name[:-4] + 'scss') }}">
   </head>
 
   <body class="text-center">
@@ -26,14 +38,14 @@
         <div class="col align-self-center"></div>
       </div>
 
-      <div class="row flex-xl-nowrap" style="height: 400px;">
-        <div class="col">
-          {% include 'components/analysis_dashboard/analyseDashboard.html' %}
-        </div>
-        <div class="col-xl-6">
+      <div class="row flex-xl-nowrap main-homepage-container">
+        <div class="col-xl-12 market-background">
           <div id="chart_container"></div>
         </div>
-        <div class="col align-self-center" style="height: inherit;">
+        <div class="col-3 side-left homepage-layer">
+          {% include 'components/analysis_dashboard/analyseDashboard.html' %}
+        </div>
+        <div class="col side-right align-self-center homepage-layer" style="height: inherit;">
           <div class="row h-100">
             <p class="w-100">Stock Symbols</p>
             <div class="w-100 h-75">{% include 'components/selectWithButtonInside.html' %}</div>

@@ -1,12 +1,8 @@
 import StockStore from "./stores/stockStore";
 import Highcharts, { Chart } from "highcharts/highstock";
-import ExportingModule from "highcharts/modules/exporting";
-import ExportDataModule from "highcharts/modules/export-data";
 import AccessibilityModule from "highcharts/modules/accessibility";
 import { StockEvent, StockData } from "./types";
 
-ExportingModule(Highcharts);
-ExportDataModule(Highcharts);
 AccessibilityModule(Highcharts);
 
 export default class StockDataFetcher {
@@ -107,8 +103,12 @@ export default class StockDataFetcher {
         const chart = Highcharts.stockChart({
             chart: {
                 renderTo: container,
+                height: window.innerHeight * 0.9,
                 backgroundColor: darkTheme.background,
-                style: { color: darkTheme.text }
+                style: { color: darkTheme.text },
+            },
+            credits: {
+                enabled: false
             },
             title: {
                 text: title,
