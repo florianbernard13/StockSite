@@ -48,7 +48,7 @@ def display_history():
 
 @app.route("/")
 def home():
-    return render_template("homepage.html")
+    return render_template("homepage.html.jinja")
 
 # Lancer Flask
 if __name__ == "__main__":

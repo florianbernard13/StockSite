@@ -25,7 +25,7 @@
           crossorigin="anonymous">
 
     <link rel="stylesheet" href="{{ vite_asset('css/site.css') }}">
-    <link rel="stylesheet" href="{{ vite_asset('scss/' + self._TemplateReference__context.name[:-4] + 'scss') }}">
+    <link rel="stylesheet" href="{{ vite_asset('scss/homepage.scss') }}">
   </head>
 
   <body class="text-center">
@@ -33,7 +33,7 @@
       <div class="row flex-xl-nowrap">
         <div class="col"></div>
         <div class="col-xl-6">
-          {% include 'components/mainDashBoard.html' %}
+          {% include 'components/mainDashBoard.html.jinja' %}
         </div>
         <div class="col align-self-center"></div>
       </div>
@@ -42,14 +42,18 @@
         <div class="col-xl-12 market-background">
           <div id="chart_container"></div>
         </div>
-        <div class="col-3 side-left homepage-layer">
-          {% include 'components/analysis_dashboard/analyseDashboard.html' %}
-        </div>
+        {% with 
+          panel_class='side-left homepage-layer', 
+          collapsed=true, 
+          content_template='components/analysis_dashboard/analyseDashboard.html.jinja' 
+        %}
+          {% include 'components/panels/slidePanel.html.jinja' %}
+        {% endwith %}
         <div class="col side-right align-self-center homepage-layer" style="height: inherit;">
           <div class="row h-100">
             <p class="w-100">Stock Symbols</p>
-            <div class="w-100 h-75">{% include 'components/selectWithButtonInside.html' %}</div>
-            <div class="w-100">{% include 'components/stock_value_list/stockValueListSelection.html' %}</div>
+            <div class="w-100 h-75">{% include 'components/selectWithButtonInside.html.jinja' %}</div>
+            <div class="w-100">{% include 'components/stock_value_list/stockValueListSelection.html.jinja' %}</div>
           </div>
         </div>
       </div>
@@ -57,7 +61,7 @@
       <div class="row flex-xl-nowrap">
         <div class="col"></div>
         <div class="col-xl-6">
-          {% include 'components/dataTools.html' %}
+          {% include 'components/dataTools.html.jinja' %}
         </div>
         <div class="col align-self-center" style="height: inherit;"></div>
       </div>
