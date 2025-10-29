@@ -2,7 +2,7 @@ import pandas as pd
 import re
 from blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
-import time
+from dateutil.relativedelta import relativedelta
 
 class StockDataFetcher:
     """
@@ -116,6 +116,17 @@ class StockDataFetcher:
         df["Datetime"] = df.index
         df["Datetime"] = df["Datetime"].dt.strftime('%Y-%m-%d %H:%M:%S')
         return df[["Datetime", "Close"]].to_dict(orient="records")
+    
+    @staticmethod
+    def get_cutoff_date(amount, unit):
+        now = datetime.now()
+        mapping = {
+            'd': timedelta(days=amount),
+            'm': relativedelta(months=amount),
+            'y': relativedelta(years=amount),
+        }
+        delta = mapping.get(unit)
+        return now - delta if delta else None
 
     def get_stock_data_for_period(self, symbol, period_str):
         data = self.fetch_stock_data(symbol)
@@ -139,21 +150,7 @@ class StockDataFetcher:
                 return None
 
             amount, unit = parsed
-            now = datetime.now()
-
-            if unit == 'd':
-                cutoff_date = now - timedelta(days=amount)
-            elif unit == 'm':
-                month = now.month - amount
-                year = now.year
-                while month <= 0:
-                    month += 12
-                    year -= 1
-                cutoff_date = datetime(year, month, 1)
-            elif unit == 'y':
-                cutoff_date = datetime(now.year - amount, 1, 1)
-            else:
-                return None  # unité inconnue
+            cutoff_date = self.get_cutoff_date(amount, unit)
 
             # Choix granularité selon la durée en jours approximative
             approx_days = amount
