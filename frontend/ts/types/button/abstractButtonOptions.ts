@@ -1,5 +1,5 @@
 import MutuallyExclusiveButtonGroup from "../../components/mutuallyExclusiveButtonGroup";
-import AbstractButton from "../../components/abstractButton";
+import AbstractButton from "../../components/buttons/abstractButton";
 
 export interface AbstractButtonOptions {
     mutuallyExclusive?: boolean;

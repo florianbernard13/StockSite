@@ -1,5 +1,5 @@
 import MutuallyExclusiveButtonGroup from "../../mutuallyExclusiveButtonGroup";
-import AbstractButton from "../../abstractButton";
+import AbstractButton from "../../buttons/abstractButton";
 import StockStore from "../../../stores/stockStore";
 
 export default class FilterPeriodButton extends AbstractButton {

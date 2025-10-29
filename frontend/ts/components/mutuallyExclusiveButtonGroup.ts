@@ -1,4 +1,4 @@
-import AbstractButton from "./abstractButton";
+import AbstractButton from "./buttons/abstractButton";
 
 export default class MutuallyExclusiveButtonGroup {
     private buttons: Set<AbstractButton> = new Set();

@@ -1,10 +1,12 @@
 import LinearRegressionAnalyzer from './linearRegressionAnalyzer';
 import GrowthEvolutionAnalyzer from './growthEvolutionAnalyzer';
 import { AnalysisResult } from '../../types';
+import AbstractButton from '../buttons/abstractButton'; 
 
 export default class AnalysisDashboard {
     private endpoint: string;
     private analyzers: (LinearRegressionAnalyzer | GrowthEvolutionAnalyzer)[];
+    private analyzeButton: AbstractButton;
 
     constructor(endpoint: string = '/data_analyzers/analysis_dispatcher') {
         this.endpoint = endpoint;
@@ -15,7 +17,7 @@ export default class AnalysisDashboard {
         this.bindEvents();
     }
 
-    private bindEvents(): void {
+    private bindEvents(button: AbstractButton): void {
         const btn = document.getElementById('analyze-all-btn');
         if (btn) btn.addEventListener('click', () => this.analyzeAll());
     }

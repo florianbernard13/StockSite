@@ -1,0 +1,20 @@
+.btn-load {
+  position: relative;
+  padding: 0.6rem 1.2rem;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover:not(.btn-lock) {
+    background: #666;
+  }
+
+  &.btn-lock {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

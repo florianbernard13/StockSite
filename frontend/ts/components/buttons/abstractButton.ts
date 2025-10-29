@@ -1,13 +1,16 @@
-import {AbstractButtonOptions} from "../types"
+import {AbstractButtonOptions} from "../../types"
 
 export default abstract class AbstractButton {
 
-    protected button: HTMLElement | null;
+    public button: HTMLElement;
     protected options: AbstractButtonOptions = {};
 
     constructor(buttonId: string, options: AbstractButtonOptions = {}) {
-        this.button = document.getElementById(buttonId);
-        if (!this.button) return;
+        const element = document.getElementById(buttonId);
+        if (!element) {
+            throw new Error(`Aucun élément avec l'id "${buttonId}" n'a été trouvé dans le DOM.`);
+        }
+        this.button = element;
 
         this.options = {
             mutuallyExclusive: false,
@@ -41,11 +44,10 @@ export default abstract class AbstractButton {
     }
 
     protected onClick(_button: AbstractButton): void {
-        // Si delegateActivation est une fonction, on l'appelle
         if (typeof this.options.delegateActivation === 'function') {
             this.options.delegateActivation(this); 
         } else {
-            this.toggleState(); // Sinon, on fait simplement un toggle
+            this.toggleState();
         }
     }
 

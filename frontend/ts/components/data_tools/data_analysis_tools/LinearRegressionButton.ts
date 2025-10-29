@@ -2,7 +2,7 @@ import StockStore from '../../../stores/stockStore';
 import StockDataFetcher from '../../../stockDataFetcher';
 import { RegressionAnalysisResponse, RegressionAnalysisRender, StockEvent } from '../../../types';
 import { DashStyleValue } from 'highcharts';
-import AbstractButton from '../../abstractButton';
+import AbstractButton from '../../buttons/abstractButton';
 
 export default class LinearRegressionButton extends AbstractButton{
     private symbol: string | null;
