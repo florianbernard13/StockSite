@@ -1,7 +1,7 @@
 import StockStore from "../stores/stockStore";
 import { StockEvent } from "../types";
 
-export default class SelectWithButtonInside {
+export default class favoriteList {
     private select: HTMLSelectElement | null;
     
     constructor() {
@@ -31,35 +31,34 @@ export default class SelectWithButtonInside {
         if (option) option.remove();
     }
 
-    // TODO: réécrire cette fonction
     // Ajoute une valeur dans la liste
     private saveValueToList(quote: StockEvent): void {
-        // if (!quote.title || quote.title.trim() === '') return;
-        // if (!this.select) return;
+        if (!quote.shortName || quote.shortName.trim() === '') return;
+        if (!this.select) return;
 
-        // const optionExists = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement | null;
-        // if (!optionExists) {
-        //     const optionHTML = `
-        //         <option value="${quote.symbol}">
-        //             ${quote.title}
-        //             <button class="delete-button">x</button>
-        //             <button class="favorite-button">♥</button>
-        //         </option>
-        //     `;
-        //     this.select.insertAdjacentHTML('beforeend', optionHTML);
-        //     const newOption = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement;
-        //     this.selectOption(newOption);
+        const optionExists = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement | null;
+        if (!optionExists) {
+            const optionHTML = `
+                <option value="${quote.symbol}">
+                    ${quote.shortName}
+                    <button class="delete-button">x</button>
+                    <button class="favorite-button">♥</button>
+                </option>
+            `;
+            this.select.insertAdjacentHTML('beforeend', optionHTML);
+            const newOption = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement;
+            this.selectOption(newOption);
 
-        //     // Ajouter les événements
-        //     const deleteBtn = newOption.querySelector('.delete-button') as HTMLElement | null;
-        //     const favoriteBtn = newOption.querySelector('.favorite-button') as HTMLElement | null;
+            // Ajouter les événements
+            const deleteBtn = newOption.querySelector('.delete-button') as HTMLElement | null;
+            const favoriteBtn = newOption.querySelector('.favorite-button') as HTMLElement | null;
 
-        //     newOption.addEventListener('click', (event) => this.onClick(event.target as HTMLElement));
-        //     deleteBtn?.addEventListener('click', (event) => this.deleteOption(event.target as HTMLElement, event));
-        //     favoriteBtn?.addEventListener('click', (event) => this.addToFavorite(event.target as HTMLElement, event));
-        // } else {
-        //     this.selectOption(optionExists);
-        // }
+            newOption.addEventListener('click', (event) => this.onClick(event.target as HTMLElement));
+            deleteBtn?.addEventListener('click', (event) => this.deleteOption(event.target as HTMLElement, event));
+            favoriteBtn?.addEventListener('click', (event) => this.addToFavorite(event.target as HTMLElement, event));
+        } else {
+            this.selectOption(optionExists);
+        }
     }
 
     // Gestion du clic sur une option
