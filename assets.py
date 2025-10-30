@@ -1,7 +1,8 @@
 # app/assets.py
 import json
 from pathlib import Path
-from flask import current_app, url_for
+from flask import current_app, url_for, g
+from markupsafe import Markup
 
 _manifest_cache = None
 
@@ -26,3 +27,12 @@ def vite_asset(path: str) -> str:
     if manifest and path in manifest:
         return url_for("static", filename=manifest[path]["file"])
     return url_for("static", filename=path)
+
+def include_module_style(name: str) -> Markup:
+    if not hasattr(g, "_loaded_styles"):
+        g._loaded_styles = set()
+    if name in g._loaded_styles:
+        return Markup("")
+    g._loaded_styles.add(name)
+    href = vite_asset(f"scss/{name}.scss")
+    return Markup(f'<link rel="stylesheet" href="{href}">')

@@ -1,4 +1,6 @@
-<link rel="stylesheet" href="{{ vite_asset('scss/slidePanel.scss') }}">
+{% block head %}
+  {{ include_module_style("slidePanel") }}
+{% endblock %}
 <div class="slide-panel {{ panel_class|default('') }}" data-collapsed="{{ collapsed|string|lower }}">
   <div class="slide-panel__tab">
     <span class="arrow"></span>

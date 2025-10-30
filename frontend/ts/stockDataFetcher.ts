@@ -103,7 +103,7 @@ export default class StockDataFetcher {
         const chart = Highcharts.stockChart({
             chart: {
                 renderTo: container,
-                height: window.innerHeight * 0.9,
+                height: window.innerHeight * 0.88,
                 backgroundColor: darkTheme.background,
                 style: { color: darkTheme.text },
             },

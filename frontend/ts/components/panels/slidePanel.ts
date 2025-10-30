@@ -1,12 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const panel = document.querySelector<HTMLDivElement>('.slide-panel');
-  const tab = panel?.querySelector<HTMLDivElement>('.slide-panel__tab');
+  const panels = document.querySelectorAll<HTMLDivElement>('.slide-panel');
 
-  if (!panel || !tab) return;
+  panels.forEach(panel => {
+    const tab = panel.querySelector<HTMLDivElement>('.slide-panel__tab');
+    const arrow = panel.querySelector<HTMLElement>('.slide-panel__tab .arrow');
 
-  tab.addEventListener('click', () => {
-    const isCollapsed = panel.getAttribute('data-collapsed') === 'true';
+    if (!tab) return;
 
-    panel.setAttribute('data-collapsed', (!isCollapsed).toString());
+    tab.addEventListener('click', () => {
+      const isCollapsed = panel.getAttribute('data-collapsed') === 'true';
+      const newVal = (!isCollapsed).toString();
+      panel.setAttribute('data-collapsed', newVal);
+
+      if (arrow) {
+        arrow.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+    });
   });
 });

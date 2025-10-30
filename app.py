@@ -4,7 +4,7 @@ from config import DevelopmentConfig
 from blueprints.stock_data import stock_data_bp
 from blueprints.data_tools import data_tools_bp
 from blueprints.data_analyzers import data_analyzers_bp
-from assets import vite_asset
+from assets import vite_asset, include_module_style
 import logging
 
 # Création de l'application Flask
@@ -13,6 +13,7 @@ app.config.from_object(DevelopmentConfig)
 
 # expose vite_asset to templates
 app.jinja_env.globals['vite_asset'] = vite_asset
+app.jinja_env.globals["include_module_style"] = include_module_style
 
 # Auto-reload templates
 app.jinja_env.cache = {}
