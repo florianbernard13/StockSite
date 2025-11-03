@@ -1,3 +1,13 @@
+@import "variables";
+
+.button {
+  border: 2px solid $color-primary;
+  background-color: $color-background;
+  border-radius: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .btn-load {
   position: relative;
   padding: 0.6rem 1.2rem;
@@ -16,5 +26,73 @@
     opacity: 0.6;
     cursor: not-allowed;
     pointer-events: none;
+  }
+}
+
+.delete-button{
+  @extend .button;
+  cursor: pointer;
+  color: $color-primary;
+
+  svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    svg { 
+      fill: $color-secondary;
+      animation: rippleFill 0.5s forwards;
+    }
+    border-color: $color-secondary;
+  }
+}
+
+.favorite-button {
+  @extend .button;
+  cursor: pointer;
+  color: $color-primary;
+
+  svg {
+    transform: scale(1.3);
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    svg { 
+      transform: scale(1.3);
+      fill: $color-background;
+    }
+    path {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      stroke: $color-secondary;
+      stroke-width: 1;
+      animation: dash 1s linear forwards;
+    }
+    border-color: $color-secondary;
+  }
+}
+
+
+
+
+@keyframes rippleFill {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
   }
 }

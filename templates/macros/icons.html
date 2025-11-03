@@ -1,0 +1,5 @@
+{# macros/icons.html #}
+{% macro icon(name, class="icon") %}
+  {% set path = "icons/" + name + ".svg" %}
+  {% include path %}
+{% endmacro %}

@@ -36,29 +36,30 @@ export default class favoriteList {
         if (!quote.shortName || quote.shortName.trim() === '') return;
         if (!this.select) return;
 
-        const optionExists = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement | null;
-        if (!optionExists) {
-            const optionHTML = `
-                <option value="${quote.symbol}">
-                    ${quote.shortName}
-                    <button class="delete-button">x</button>
-                    <button class="favorite-button">♥</button>
-                </option>
-            `;
-            this.select.insertAdjacentHTML('beforeend', optionHTML);
-            const newOption = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement;
-            this.selectOption(newOption);
+        const existingOption  = this.select.querySelector(`option[value="${quote.symbol}"]`) as HTMLOptionElement | null;
 
-            // Ajouter les événements
-            const deleteBtn = newOption.querySelector('.delete-button') as HTMLElement | null;
-            const favoriteBtn = newOption.querySelector('.favorite-button') as HTMLElement | null;
-
-            newOption.addEventListener('click', (event) => this.onClick(event.target as HTMLElement));
-            deleteBtn?.addEventListener('click', (event) => this.deleteOption(event.target as HTMLElement, event));
-            favoriteBtn?.addEventListener('click', (event) => this.addToFavorite(event.target as HTMLElement, event));
-        } else {
-            this.selectOption(optionExists);
+        if (existingOption) {
+            this.selectOption(existingOption);
+            return;
         }
+
+        const template = document.getElementById("favorite-option-template") as HTMLTemplateElement;
+        if (!template?.content) return;
+
+        const clone = template.content.firstElementChild!.cloneNode(true) as HTMLOptionElement;
+        clone.value = quote.symbol;
+        clone.querySelector(".option-label")!.textContent = quote.shortName;
+
+        this.select.appendChild(clone);
+        this.selectOption(clone);
+
+        const deleteBtn = clone.querySelector(".delete-button") as HTMLElement;
+        const favoriteBtn = clone.querySelector(".favorite-button") as HTMLElement;
+
+        // Événements
+        deleteBtn.addEventListener("click", (event) => this.deleteOption(deleteBtn, event));
+        favoriteBtn.addEventListener("click", (event) => this.addToFavorite(favoriteBtn, event));
+        clone.addEventListener("click", () => this.onClick(clone));
     }
 
     // Gestion du clic sur une option

@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="{{ vite_asset('css/' + self._TemplateReference__context.name[:-4] + 'css') }}">
+{% from "macros/icons.html" import icon %}
+{% block head %}
+  {{ include_module_style("button") }}
+{% endblock %}
+
+<template id="favorite-option-template">
+  <option value="">
+    <span class="option-label"></span>
+    <button class="delete-button">{{ icon("close") }}</button>
+    <button class="favorite-button">{{ icon("heart") }}</button>
+  </option>
+</template>
+
+<div id="symbolSelect" class="cpnt-select-with-button"></div>
