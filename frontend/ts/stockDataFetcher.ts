@@ -182,4 +182,42 @@ export default class StockDataFetcher {
         } as Highcharts.Options);
         return chart;
     }
+
+    async fetchRealTimeData(): Promise<void> {
+        if (!this.symbol) return;
+
+        try {
+            const response = await fetch(`/api/stock_data/realtime?symbol=${this.symbol}`, {
+                method: "GET",
+                cache: "no-store"
+            });
+        
+        if (!response.ok) {
+            throw new Error("Erreur réseau : " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.price || !data.datetime) {
+            console.warn("Données temps réel invalides :", data);
+            return;
+        }
+
+        const chart = this.getChart();
+        if (!chart) {
+            console.warn("Aucun graphique initialisé pour la mise à jour temps réel.");
+            return;
+        }
+
+        const newPoint = [Date.parse(data.datetime), data.price];
+        const series = chart.series[0];
+        series.addPoint(newPoint, true, false);
+
+        chart.setTitle({ text: `${data.shortName} (${data.symbol}) - ${data.price.toFixed(2)} USD` });
+        console.log("Point temps réel ajouté :", newPoint);
+
+        } catch (err) {
+            console.error("Erreur lors de la récupération des données temps réel :", err);
+        }
+    }
 }

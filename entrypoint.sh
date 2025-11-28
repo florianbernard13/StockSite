@@ -7,4 +7,4 @@ cp -r /usr/src/cache/node_modules/. /app/node_modules/
 
 # Lancer les services
 echo "Starting Flask and Vite..."
-npm run dev & flask run --host=0.0.0.0 --reload --debugger
+npm run dev & python3 -u -m flask run --host=0.0.0.0

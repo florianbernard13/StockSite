@@ -4,7 +4,7 @@ from blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-class StockDataFetcher:
+class YfinanceFetcher:
     """
     Classe pour récupérer et mettre en cache les données boursières depuis Yahoo Finance.
     Elle gère trois granularités :
@@ -30,8 +30,9 @@ class StockDataFetcher:
         try:
             stock = SafeTicker(symbol)
             stock_info = stock.info
+            print(stock_info)
             short_name = stock_info.get("shortName", "N/A")
-            price = stock_info.get("ask", stock_info.get("previousClose"))
+            price = stock_info.get("ask", stock_info.get("currentPrice"))
 
             # Récupération des historiques aux différentes granularités
             last_days_history = stock.history(period="5d", interval="1m")

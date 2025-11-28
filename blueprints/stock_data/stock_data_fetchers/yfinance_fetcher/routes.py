@@ -1,12 +1,11 @@
 from flask import request, jsonify
-from .services import StockDataFetcher
-from .shared_fetcher import shared_stock_data_fetcher
-from . import stock_data_fetcher_bp
+from ..shared_fetcher import shared_stock_data_fetcher
+from . import yfinance_fetcher_bp
 
 stock_service = shared_stock_data_fetcher
 
 
-@stock_data_fetcher_bp.route("/stock_data")
+@yfinance_fetcher_bp.route("/stock_data")
 def get_stock_data():
     """
     Récupère les données boursières pour la période maximale possible (historique complet).
@@ -22,7 +21,7 @@ def get_stock_data():
 
     return jsonify(data)
 
-@stock_data_fetcher_bp.route("/stock_data/last/<string:period>")
+@yfinance_fetcher_bp.route("/stock_data/last/<string:period>")
 def get_stock_data_last_period(period):
     """
     Récupère les données pour les derniers X jours, mois ou années.
@@ -46,3 +45,22 @@ def get_stock_data_last_period(period):
         return jsonify({"error": "Données non disponibles"}), 404
 
     return jsonify(data)
+
+@yfinance_fetcher_bp.route("/stock_data/realtime")
+def get_realtime_stock_data():
+    """
+    Récupère les informations temps réel d'une action (nom, symbole, dernier prix).
+    Ex : /stock_data/realtime?symbol=AAPL
+    """
+    symbol = request.args.get("symbol", "AAPL").upper()
+
+    data = stock_service.fetch_stock_data(symbol)
+    if not data:
+        return jsonify({"error": f"Impossible de récupérer les données pour {symbol}"}), 404
+    realtime_info = {
+        "symbol": data["symbol"],
+        "shortName": data["shortName"],
+        "price": data["price"],
+    }
+
+    return jsonify(realtime_info), 200

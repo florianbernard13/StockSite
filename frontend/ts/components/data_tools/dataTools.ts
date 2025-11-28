@@ -2,6 +2,7 @@ import FilterPeriodButton from "./times_tools/filterPeriodButton";
 import LinearRegressionButton from "./data_analysis_tools/LinearRegressionButton";
 import MutuallyExclusiveButtonGroup from "../mutuallyExclusiveButtonGroup";
 import StockDataFetcher from "../../stockDataFetcher";
+import RealTimeButton from "./times_tools/RealTimeButton";
 
 export default class DataTools {
     constructor(stockDataFetcher: StockDataFetcher) {
@@ -11,6 +12,8 @@ export default class DataTools {
         new FilterPeriodButton(15, 'd', mutuallyExclusiveButtonGroup);
         new FilterPeriodButton(3, 'm', mutuallyExclusiveButtonGroup);
         new FilterPeriodButton(6, 'm', mutuallyExclusiveButtonGroup);
+
+        new RealTimeButton(stockDataFetcher, mutuallyExclusiveButtonGroup);
 
         new LinearRegressionButton(stockDataFetcher);
     }
