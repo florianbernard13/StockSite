@@ -1,4 +1,4 @@
-from blueprints.stock_data.configs.cac40 import CAC40_COMPANIES
+from app.blueprints.stock_data.configs.cac40 import CAC40_COMPANIES
 
 class StockSearchService:
 

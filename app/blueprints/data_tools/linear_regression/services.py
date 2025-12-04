@@ -1,6 +1,6 @@
 import numpy as np
 from datetime import datetime, timedelta
-from blueprints.stock_data.stock_data_fetchers.yfinance_fetcher.services import YfinanceFetcher
+from app.blueprints.stock_data.stock_data_fetchers.yfinance_fetcher.services import YfinanceFetcher
 
 class LinearRegressionService:
     def __init__(self, data, time_span=None):

@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-from blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
+from app.blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -18,6 +18,10 @@ class YfinanceFetcher:
     def __init__(self):
         # Dictionnaire de cache pour stocker les données par symbole
         self.stock_cache = {}
+
+    def fetch_stock_info(self, symbol):
+        if symbol in self.stock_cache:
+            return self.stock_cache[symbol]
 
     def fetch_stock_data(self, symbol):
         """

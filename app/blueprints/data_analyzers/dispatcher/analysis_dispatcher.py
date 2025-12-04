@@ -1,9 +1,9 @@
-from blueprints.stock_data.stock_data_fetchers.shared_fetcher import shared_stock_data_fetcher
-from blueprints.data_analyzers.linear_regressions.standard_deviation.services import LinearRegressionWithStdDeviationAnalyzer
-from blueprints.data_analyzers.growth_evolutions.services import GrowthEvolutionAnalyzer
-from blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
-from blueprints.stock_data.configs.cac40 import CAC40_COMPANIES
-from blueprints.data_analyzers.analyzer_registry import ANALYZERS_REGISTRY
+from app.blueprints.stock_data.stock_data_fetchers.shared_fetcher import shared_stock_data_fetcher
+from app.blueprints.data_analyzers.linear_regressions.standard_deviation.services import LinearRegressionWithStdDeviationAnalyzer
+from app.blueprints.data_analyzers.growth_evolutions.services import GrowthEvolutionAnalyzer
+from app.blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
+from app.blueprints.stock_data.configs.cac40 import CAC40_COMPANIES
+from app.blueprints.data_analyzers.analyzer_registry import ANALYZERS_REGISTRY
 import logging
 
 logger = logging.getLogger(__name__)

@@ -5,7 +5,7 @@ import yfinance as yf
 import requests
 from .config import YFINANCE_DELAY
 import ssl
-from blueprints.stock_data.yfinance_wrapper.http_adapter import TLSHttpAdapter
+from app.blueprints.stock_data.yfinance_wrapper.http_adapter import TLSHttpAdapter
 
 def create_tls_context():
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)

@@ -1,8 +1,8 @@
 # data_analyzers/linear_regressions/standard_deviation/services.py
 
-from blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
-from blueprints.data_tools.linear_regression.services import LinearRegressionService
-from blueprints.data_analyzers.analyzer_registry import register_analyzer
+from app.blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
+from app.blueprints.data_tools.linear_regression.services import LinearRegressionService
+from app.blueprints.data_analyzers.analyzer_registry import register_analyzer
 
 @register_analyzer
 class LinearRegressionWithStdDeviationAnalyzer(BaseAnalyzer):

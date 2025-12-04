@@ -1,12 +1,12 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV NODE_VERSION=20
+ENV NODE_VERSION=22
 
 # Installer outils système et Node.js
 RUN apt-get update && apt-get install -y \
     default-jdk \
-    ca-certificates \
+    ca-certificates \   
     openssl \
     libssl-dev \
     curl \

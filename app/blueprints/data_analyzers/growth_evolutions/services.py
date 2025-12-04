@@ -1,6 +1,6 @@
-from blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
-from blueprints.data_tools.growth_evolution.services import GrowthEvolutionService
-from blueprints.data_analyzers.analyzer_registry import register_analyzer
+from app.blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
+from app.blueprints.data_tools.growth_evolution.services import GrowthEvolutionService
+from app.blueprints.data_analyzers.analyzer_registry import register_analyzer
 
 @register_analyzer
 class GrowthEvolutionAnalyzer(BaseAnalyzer):
