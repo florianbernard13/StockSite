@@ -21,10 +21,7 @@ class SafeTicker:
     chaque appel à .history() en respectant YFINANCE_DELAY.
     """
     def __init__(self, symbol: str):
-        session = requests.Session()
-        adapter = TLSHttpAdapter(ssl_context=create_tls_context())
-        session.mount("https://", adapter)
-        self._ticker = yf.Ticker(symbol, session=session)
+        self._ticker = yf.Ticker(symbol)
 
     @property
     def info(self):
