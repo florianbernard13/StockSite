@@ -1,4 +1,4 @@
-#!/var/opt/personel/StockSite/StockSiteVenv/bin/python
+#!/home/ubuntu/projects/StockSite/StockSiteVenv/bin/python
 
 import datetime
 import os

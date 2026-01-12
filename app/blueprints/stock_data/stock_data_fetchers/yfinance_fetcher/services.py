@@ -118,9 +118,9 @@ class YfinanceFetcher:
         df = df.copy()
         # Supprimer le fuseau horaire
         df.index = df.index.tz_localize(None)
-        df["Datetime"] = df.index
-        df["Datetime"] = df["Datetime"].dt.strftime('%Y-%m-%d %H:%M:%S')
-        return df[["Datetime", "Close"]].to_dict(orient="records")
+        df.loc[:, "Datetime"] = df.index
+        df.loc[:, "Datetime"] = df["Datetime"].dt.strftime('%Y-%m-%d %H:%M:%S')
+        return df.loc[:, ["Datetime", "Close"]].to_dict(orient="records")
     
     @staticmethod
     def get_cutoff_date(amount, unit):

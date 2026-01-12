@@ -1,10 +1,9 @@
 from . import boursorama_fetcher_bp
-import request
+from .services import  BoursoramaFetcher
+from flask import jsonify
 
 @boursorama_fetcher_bp.route("/boursorama-fetcher-bp")
 def getRealTimeDate():
-    url = 
-    request.get(url, timeout=5)
-
-def UrlGenerator():
-    
+    obj = BoursoramaFetcher()
+    print(obj.real_time("AL2SI.PA"), flush=True)
+    return '{"success": true}'
