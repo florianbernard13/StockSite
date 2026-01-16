@@ -6,7 +6,6 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 def home():
     return render_template("homepage.html.jinja")
-
 @main_bp.route("/quote")
 def display_quote():
     symbol = request.args.get('symbol', "AAPL")

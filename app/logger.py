@@ -8,8 +8,6 @@ def setup_logging():
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
-    logging.getLogger('werkzeug').setLevel(logging.WARNING)
-
     warnings.filterwarnings("ignore",category=FutureWarning,module="pandas")
     warnings.filterwarnings("ignore", category=FutureWarning, module="yfinance.*")
     warnings.simplefilter("ignore", pd.errors.SettingWithCopyWarning)

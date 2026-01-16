@@ -1,10 +1,17 @@
+from shlex import quote
 import pandas as pd
 import re
+from app.blueprints.stock_data.stock_data_fetchers.base_fetcher import BaseFetcher
 from app.blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from app.builders.quote_builder import QuoteBuilder
+from app.adapters.price_series_adapter import PriceSeriesAdapter
+import logging
 
-class YfinanceFetcher:
+logger = logging.getLogger(__name__)
+
+class YfinanceFetcher(BaseFetcher):
     """
     Classe pour récupérer et mettre en cache les données boursières depuis Yahoo Finance.
     Elle gère trois granularités :
@@ -17,44 +24,55 @@ class YfinanceFetcher:
     
     def __init__(self):
         # Dictionnaire de cache pour stocker les données par symbole
-        self.stock_cache = {}
-
-    def fetch_stock_info(self, symbol):
-        if symbol in self.stock_cache:
-            return self.stock_cache[symbol]
+        super().__init__()
 
     def fetch_stock_data(self, symbol):
         """
-        Récupère les données depuis Yahoo Finance pour un symbole donné et les stocke dans le cache.
-        Si les données existent déjà, elles sont retournées directement.
+        Récupère les données depuis Yahoo Finance pour un symbole donné,
+        hydrate le Quote et met en cache les métadonnées.
         """
         if symbol in self.stock_cache:
+            logger.debug("Stock data cache hit for symbol=%r", symbol)
             return self.stock_cache[symbol]
         
+        logger.info("Fetching stock data for symbol=%r", symbol)
+        
         try:
+            quote = self.quote_repository.get_or_create(symbol)
+            quote_builder = QuoteBuilder.from_quote(quote)
+
             stock = SafeTicker(symbol)
-            stock_info = stock.info
-            print(stock_info)
+            stock_info = stock.info or {}
+
             short_name = stock_info.get("shortName", "N/A")
             price = stock_info.get("ask", stock_info.get("currentPrice"))
 
-            # Récupération des historiques aux différentes granularités
+            quote_builder.with_name(short_name)
+
+            # Historiques Yahoo (brut)
             last_days_history = stock.history(period="5d", interval="1m")
-            medium_history   = stock.history(period="1mo", interval="60m")
-            late_history     = stock.history(period="max", interval="1d")
+            medium_history = stock.history(period="1mo", interval="60m")
+            late_history = stock.history(period="max", interval="1d")
+            
+            # Conversion → modèle
+            self.convert_and_add_price_many(last_days_history, quote_builder)
+            self.convert_and_add_price_many(medium_history, quote_builder)
+            self.convert_and_add_price_many(late_history, quote_builder)
+
+            quote = quote_builder.build()
+            self.quote_repository.save(quote)
 
             self.stock_cache[symbol] = {
                 "symbol": symbol,
                 "shortName": short_name,
                 "price": price,
-                "last_days_history": last_days_history,
-                "medium_history": medium_history,
-                "late_history": late_history
             }
-            
+
+            logger.info("Stock data successfully fetched for symbol=%r", symbol)
             return self.stock_cache[symbol]
-        except Exception as e:
-            print(f"Erreur lors de la récupération des données de {symbol} : {e}")
+            
+        except Exception:
+            logger.exception("Failed to fetch stock data for symbol=%r", symbol)
             return None
 
     def parse_period(self, period_str):
@@ -133,54 +151,73 @@ class YfinanceFetcher:
         delta = mapping.get(unit)
         return now - delta if delta else None
 
-    def get_stock_data_for_period(self, symbol, period_str):
-        data = self.fetch_stock_data(symbol)
-        if not data:
+    def get_stock_data_for_period(self, symbol: str, period_str: str):
+        meta = self.fetch_stock_data(symbol)
+        if meta is None:
+            logger.warning("Unable to fetch stock data for symbol=%r", symbol)
             return None
 
-        histories = (
-            data.get("last_days_history"),
-            data.get("medium_history"),
-            data.get("late_history"),
-        )
-        if all(hasattr(df, "empty") and df.empty for df in histories):
-            print(f"[WARN] No price history at all for {symbol!r}; ignoring this symbol.")
+        quote = self.quote_repository.get(symbol)   
+        if quote is None:
+            logger.warning("Quote not found for symbol=%r", symbol)
             return None
 
+        price_series = quote.price_series
+
+        if not price_series or not price_series.prices:
+            logger.warning("No price series available for symbol=%r", symbol)
+            return None
+
+        # Détermination de la période
         if period_str == "max":
-            df = data["late_history"].copy()
+            sliced_series = price_series
+            logger.debug("Using full price series for symbol=%r", symbol)
         else:
-            parsed = self.parse_period(period_str)  # Ex : (5, 'd') ou (2, 'm') ou (1, 'y')
+            parsed = self.parse_period(period_str)
             if parsed is None:
+                logger.warning(
+                    "Invalid period format %r for symbol=%r",
+                    period_str,
+                    symbol,
+                )
                 return None
 
             amount, unit = parsed
             cutoff_date = self.get_cutoff_date(amount, unit)
 
-            # Choix granularité selon la durée en jours approximative
-            approx_days = amount
-            if unit == 'm':
-                approx_days = amount * 30
-            elif unit == 'y':
-                approx_days = amount * 365
-
-            if approx_days <= 5:
-                df = data["last_days_history"].copy()
-            elif approx_days <= 30:
-                df = data["medium_history"].copy()
-            else:
-                df = data["late_history"].copy()
-
-            if df.empty:
+            if cutoff_date is None:
+                logger.warning(
+                    "Unable to compute cutoff date (amount=%s, unit=%s) for symbol=%r",
+                    amount,
+                    unit,
+                    symbol,
+                )
                 return None
-            df.index = df.index.tz_localize(None)
-            df = df[df.index >= cutoff_date]
 
-        history_data = self.format_history_json(df)
+            logger.debug(
+                "Slicing price series for symbol=%r from cutoff_date=%s",
+                symbol,
+                cutoff_date,
+            )
+
+            sliced_series = price_series.slice(start=cutoff_date)
+
+            if not sliced_series.prices:
+                logger.warning(
+                    "No price data after cutoff_date=%s for symbol=%r",
+                    cutoff_date,
+                    symbol,
+                )
+                return None
 
         return {
-            "symbol": data["symbol"],
-            "shortName": data["shortName"],
-            "price": data["price"],
-            "history": history_data
+            "symbol": quote.symbol,
+            "shortName": quote.name,
+            "price": quote.current_price,
+            "history": sliced_series.to_json(),
         }
+    
+    @staticmethod
+    def convert_and_add_price_many(yfinance_dataframe: pd.DataFrame, quote_builder: QuoteBuilder):
+        converted_yfinance_dataframe = PriceSeriesAdapter.from_yfinance(yfinance_dataframe)
+        quote_builder.add_price_many(converted_yfinance_dataframe)

@@ -10,11 +10,13 @@ def get_stock_data():
     """
     Récupère les données boursières pour la période maximale possible (historique complet).
     """
-    symbol = request.args.get("symbol", "AAPL")  # Par défaut, Apple
-    period_str = "max"  # Période maximale
+    symbol = request.args.get("symbol")
+
+    if not symbol:
+        return jsonify({"error": "Missing required parameter 'symbol'"}), 404
 
     # Appel de la méthode pour récupérer les données avec la période maximale
-    data = stock_service.get_stock_data_for_period(symbol, period_str)
+    data = stock_service.get_stock_data_for_period(symbol, "max")
 
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
