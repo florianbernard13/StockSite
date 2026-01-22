@@ -49,7 +49,7 @@ export default class StockDataFetcher {
 
             if (data.shortName !== stock.shortName) {
                 //Le nom a déjà été poussé et va trigger la récupération des données qui retriger la notification
-                StockStore.setStock(data.symbol, data.shortName, data.data2);
+                StockStore.setStock(data.symbol, data.shortName, data.history);
             }
 
             const chart = this.RenderChart(data);

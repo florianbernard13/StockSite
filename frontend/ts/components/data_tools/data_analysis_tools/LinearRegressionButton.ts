@@ -22,17 +22,21 @@ export default class LinearRegressionButton extends AbstractButton{
         this.linearRegressionDisplay = false;
 
         StockStore.onUpdate((stock: StockEvent) => {
+            console.log("StockStore.onUpdate");
+            console.log(stock)
             if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan() && this.data.length != 0) return;
             this.symbol = stock.symbol;
             this.timeSpan = StockStore.getTimeSpan();
             this.data = stock.history;
 
-            if(!this.linearRegressionDisplay) return;
+            if(!this.linearRegressionDisplay || !this.data.length) return;
+            console.log("handleRegression");
             this.handleRegression();
         });
     }
 
     protected onActivate(): void {
+        console.log("onActivate");
         this.linearRegressionDisplay = true;
         this.handleRegression();
     }
@@ -55,29 +59,30 @@ export default class LinearRegressionButton extends AbstractButton{
     }
 
     async handleRegression(): Promise<void> {
-        if (!this.data) {
-            console.error("Pas de données disponibles pour la régression.");
-            return;
-        }
-
         try {
-            const regressionData = await this.fetchLinearRegression(this.data);
-            if (regressionData) {
-                console.log("Régression reçue:", regressionData);
-                this.displayResults(regressionData);
-            } else {
+            const regressionData = await this.fetchLinearRegression();
+
+            if (!regressionData) {
                 console.error("Erreur dans les données reçues.");
+                return;
             }
+
+            console.log("Régression reçue:", regressionData);
+            this.displayResults(regressionData);
+
         } catch (error) {
             console.error("Erreur dans le traitement de la régression:", error);
         }
     }
 
-    private async fetchLinearRegression(data: any): Promise<RegressionAnalysisResponse> {
-       const payload = {
-            data,
-            timeSpan: StockStore.getTimeSpan()
+    private async fetchLinearRegression(): Promise<RegressionAnalysisResponse> {
+        if (!this.symbol) throw new Error("Pas de symbole sélectionné.");
+
+        const payload = {
+            symbol: this.symbol,
+            period: StockStore.getTimeSpan() || "max"
         };
+
         console.log("Données encodées:", payload);
 
         const apiUri = "/data_tools/linear_regression/";

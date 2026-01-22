@@ -1,5 +1,8 @@
 from flask import request, jsonify
+
+from app.extensions import quote_repository
 from .services import LinearRegressionService
+from app.services.quote_query_service import QuoteQueryService
 from . import linear_regression_bp
 import logging
 
@@ -14,35 +17,35 @@ def linear_regression():
             logger.warning("Aucun payload JSON fourni dans la requête.")
             return jsonify({"error": "Aucun payload JSON fourni."}), 400
         
-        data = payload.get("data")
-        time_span = payload.get("timeSpan")
+        symbol = payload.get("symbol")
+        period = payload.get("period")
 
-        if not data:
-            logger.warning("Aucune donnée boursière valide fournie dans le payload.")
-            return jsonify({"error": "Aucune donnée boursière valide fournie."}), 400
+        if not symbol:
+            logger.warning("Aucun symbole fourni dans le payload.")
+            return jsonify({"error": "Le symbole est obligatoire."}), 400
+        if not period:
+            logger.warning("Aucune période fournie dans le payload.")
+            return jsonify({"error": "La période est obligatoire."}), 400
+        
+        stock_data = quote_repository.get(symbol)
+        if not stock_data:
+            logger.warning("Aucune donnée boursière disponible pour %r sur la période %r.", symbol, period)
+            return jsonify({"error": "Aucune donnée boursière disponible."}), 404
+        
+        sliced_series = QuoteQueryService.get_price_series_for_period(symbol, period)
+        if sliced_series is None:
+            return None
 
-        if not isinstance(data, list):
-            logger.warning("Les données fournies ne sont pas une liste.")
-            return jsonify({"error": "Les données doivent être une liste."}), 400
+        price_series_list = sliced_series.all_prices
+        result = LinearRegressionService(price_series_list, period).get_results()
 
-        for i, item in enumerate(data):
-            if not isinstance(item, dict):
-                logger.warning("Élément %d des données n'est pas un dictionnaire.", i)
-                return jsonify({"error": "Chaque élément des données doit être un dictionnaire."}), 400
-            if "Close" not in item:
-                logger.warning("Élément %d manque la clé 'Close'.", i)
-                return jsonify({"error": "Chaque élément des données doit contenir la clé 'Close'."}), 400
-            if "Datetime" not in item:
-                logger.warning("Élément %d manque la clé 'Datetime'.", i)
-                return jsonify({"error": "Chaque élément des données doit contenir la clé 'Datetime'."}), 400
-
-        result = LinearRegressionService(data, time_span).get_results()
         logger.info(
-            "✔️ Analyse linéaire terminée pour %d points sur un intervalle '%s'.",
-            len(data),
-            time_span
+            "✔️ Analyse linéaire terminée pour %d points sur %r (%s).",
+            len(price_series_list),
+            symbol,
+            period
         )
-        return jsonify(result)  # jsonify() gère la conversion en JSON
+        return jsonify(result)
     except Exception as e:
         logger.error("Erreur lors de l'analyse linéaire : %s", e, exc_info=True)
         return jsonify({"error": str(e)}), 500

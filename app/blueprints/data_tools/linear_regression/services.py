@@ -1,6 +1,6 @@
 import numpy as np
 from datetime import datetime, timedelta
-from app.blueprints.stock_data.stock_data_fetchers.yfinance_fetcher.services import YfinanceFetcher
+from app.services.price_series_slicer import PriceSeriesSlicer
 
 class LinearRegressionService:
     def __init__(self, data, time_span=None):
@@ -22,8 +22,8 @@ class LinearRegressionService:
         Filtre les données selon le time_span fourni (ex: '1m', '10d', '1y').
         Utilise la méthode parse_period() du StockDataFetcher pour l’interprétation.
         """
-        fetcher = StockDataFetcher()
-        parsed = fetcher.parse_period(time_span)
+        price_series_slicer = PriceSeriesSlicer()
+        parsed = price_series_slicer.parse_period(time_span)
         if not parsed:
             print(f"[WARN] TimeSpan invalide: {time_span}")
             return data
@@ -56,16 +56,16 @@ class LinearRegressionService:
         return filtered or data  # fallback si trop peu de données
 
     def extract_data(self):
-        """Extrait les dates et les valeurs de clôture."""
-        if isinstance(self.data, list):
-            x_labels = [d["Datetime"] for d in self.data]
-            y = [d["Close"] for d in self.data]
-        elif isinstance(self.data, dict):
-            x_labels = self.data.get("Datetime")
-            y = self.data.get("Close")
-        else:
-            raise ValueError("Format de données non supporté.")
-        return x_labels, np.array(y)
+        if not self.data:
+            raise ValueError("Aucune donnée fournie pour la régression linéaire.")
+        try:
+            x_labels, y = zip(*self.data)
+        except (TypeError, ValueError):
+            raise ValueError(
+                "Les données doivent être une liste de tuples (datetime, float)."
+            )
+
+        return list(x_labels), np.asarray(y, dtype=float)
 
     def compute_regression(self):
         """Calcule la régression linéaire et les statistiques associées."""

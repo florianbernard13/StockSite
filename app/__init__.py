@@ -7,6 +7,7 @@ from app.blueprints.data_analyzers import data_analyzers_bp
 from app.assets import vite_asset, include_module_style
 from app.blueprints.main import main_bp
 from app.logger import setup_logging
+from app.extensions import quote_repository
 
 setup_logging()
 
