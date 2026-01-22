@@ -17,7 +17,7 @@ export default class StockDataFetcher {
         StockStore.onUpdate((stock: StockEvent) => {
             if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan()) return;
             this.symbol = stock.symbol;
-            this.timeSpan = StockStore.getTimeSpan();
+            this.timeSpan = StockStore.getTimeSpan();       
             console.log("Mise à jour détectée :", stock);
             this.LoadChart(stock);
         });

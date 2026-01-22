@@ -22,21 +22,17 @@ export default class LinearRegressionButton extends AbstractButton{
         this.linearRegressionDisplay = false;
 
         StockStore.onUpdate((stock: StockEvent) => {
-            console.log("StockStore.onUpdate");
-            console.log(stock)
             if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan() && this.data.length != 0) return;
             this.symbol = stock.symbol;
             this.timeSpan = StockStore.getTimeSpan();
             this.data = stock.history;
 
             if(!this.linearRegressionDisplay || !this.data.length) return;
-            console.log("handleRegression");
             this.handleRegression();
         });
     }
 
     protected onActivate(): void {
-        console.log("onActivate");
         this.linearRegressionDisplay = true;
         this.handleRegression();
     }

@@ -12,6 +12,7 @@ export default class DataTools {
         new FilterPeriodButton(15, 'd', mutuallyExclusiveButtonGroup);
         new FilterPeriodButton(3, 'm', mutuallyExclusiveButtonGroup);
         new FilterPeriodButton(6, 'm', mutuallyExclusiveButtonGroup);
+        new FilterPeriodButton(1, 'y', mutuallyExclusiveButtonGroup);
 
         new RealTimeButton(stockDataFetcher, mutuallyExclusiveButtonGroup);
 
