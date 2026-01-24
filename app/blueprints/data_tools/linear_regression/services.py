@@ -1,9 +1,10 @@
 import numpy as np
 from datetime import datetime, timedelta
 from app.services.price_series_slicer import PriceSeriesSlicer
+from app.models.price_series import PricePoint
 
 class LinearRegressionService:
-    def __init__(self, data, time_span=None):
+    def __init__(self, data: list[PricePoint], time_span=None):
         self.data = data
         self.time_span = time_span
         self.data = self._filter_by_time_span(data, time_span) if time_span else data

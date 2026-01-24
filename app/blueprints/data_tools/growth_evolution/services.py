@@ -1,7 +1,8 @@
 import numpy as np
+from app.models.price_series import PricePoint
 
 class GrowthEvolutionService:
-    def __init__(self, data):
+    def __init__(self, data: list[PricePoint]):
         """
         data: list of {"Datetime": ..., "Close": ...} ou dict avec clés "Datetime" et "Close"
         """
@@ -17,15 +18,13 @@ class GrowthEvolutionService:
         self.instability = None
 
     def extract_data(self):
-        """Extrait les dates et les valeurs de clôture."""
-        if isinstance(self.data, list):
-            x_labels = [d["Datetime"] for d in self.data]
-            y = [d["Close"] for d in self.data]
-        elif isinstance(self.data, dict):
-            x_labels = self.data.get("Datetime")
-            y = self.data.get("Close")
-        else:
-            raise ValueError("Format de données non supporté.")
+        """Extrait les dates et les valeurs de clôture depuis une liste de PricePoint."""
+        if not self.data:
+            raise ValueError("Aucune donnée disponible pour extraire les valeurs.")
+
+        x_labels = [dt for dt, _ in self.data]
+        y = [price for _, price in self.data]
+
         return x_labels, np.array(y, dtype=float)
 
     def compute_metrics(self):

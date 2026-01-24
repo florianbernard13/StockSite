@@ -35,5 +35,5 @@ class BaseFetcher:
             "symbol": quote.symbol,
             "shortName": quote.name,
             "price": quote.current_price,
-            "history": sliced_series.to_json(),
+            "history": sliced_series,
         }

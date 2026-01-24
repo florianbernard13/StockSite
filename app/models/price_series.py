@@ -1,6 +1,9 @@
 from datetime import datetime
 from dataclasses import dataclass
 from pyrsistent import pvector
+from typing import TypeAlias
+
+PricePoint: TypeAlias = tuple[datetime, float]
 
 @dataclass(frozen=True)
 class PriceSeries:
@@ -25,7 +28,7 @@ class PriceSeries:
         return self.prices[-1][1] if self.prices else None
     
     @property
-    def all_prices(self) -> list[tuple[datetime, float]]:
+    def all_prices(self) -> list[PricePoint]:
         return list(self.prices)
     
     def merge(self, other: PriceSeries) -> PriceSeries:

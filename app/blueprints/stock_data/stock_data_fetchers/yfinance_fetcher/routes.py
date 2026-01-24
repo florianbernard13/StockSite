@@ -21,7 +21,12 @@ def get_stock_data():
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
 
-    return jsonify(data)
+    return jsonify({
+        "symbol": data["symbol"],
+        "shortName": data["shortName"],
+        "price": data["price"],
+        "history": data["history"].to_json(),
+    })
 
 @yfinance_fetcher_bp.route("/stock_data/last/<string:period>")
 def get_stock_data_last_period(period):
@@ -46,7 +51,12 @@ def get_stock_data_last_period(period):
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
 
-    return jsonify(data)
+    return jsonify({
+        "symbol": data["symbol"],
+        "shortName": data["shortName"],
+        "price": data["price"],
+        "history": data["history"].to_json(),
+    })
 
 @yfinance_fetcher_bp.route("/stock_data/realtime")
 def get_realtime_stock_data():
