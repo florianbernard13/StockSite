@@ -10,10 +10,11 @@ export default abstract class BaseAnalyzer {
         this.label = label;
     }
 
-    public addHeaderColumn(theadRow: HTMLTableRowElement): void {
+    public addHeaderColumn(theadRow: HTMLTableRowElement): HTMLTableCellElement {
         const th = document.createElement('th');
         th.textContent = this.label;
         theadRow.appendChild(th);
+        return th
     }
 
     public addBodyCell(row: HTMLTableRowElement, slug: string): void {
@@ -43,7 +44,7 @@ export default abstract class BaseAnalyzer {
         }
     }
 
-     protected _slugify(text: string): string {
+    protected _slugify(text: string): string {
         return text.toLowerCase().replace(/[\.\/]/g, '-');
     }
 

@@ -1,11 +1,20 @@
 import BaseAnalyzer from './baseAnalyzer';
 import { LinearRegressionAnalysis } from '../../types';
+import { AnalysisResult } from '../../types';
+import { SortableAnalyzer } from './interfaces/sortableAnalyzer';
 
-export default class LinearRegressionAnalyzer extends BaseAnalyzer {
+export default class LinearRegressionAnalyzer extends BaseAnalyzer implements SortableAnalyzer {
     public type = 'linear_regression';
 
     constructor() {
         super('regression', 'Régression Linéaire');
+    }
+
+    getSortValue(result: AnalysisResult): number | null {
+        const analysis = result.analysis?.[this.type];
+        if (!analysis || analysis.predicted === 0) return null;
+
+        return ((analysis.actual - analysis.predicted) / analysis.predicted) * 100;
     }
 
     protected _renderResult(analysis: LinearRegressionAnalysis): string {

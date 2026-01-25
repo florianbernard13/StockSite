@@ -1,0 +1,24 @@
+@import "variables";
+
+th.sortable {
+    cursor: pointer;
+    position: relative;
+    padding-right: 20px;
+}
+
+th.sortable:hover {
+    color: $color-secondary;
+}
+
+th.sortable::after {
+  content: '';
+  margin-left: 5px;
+}
+
+th.sortable.sort-asc::after {
+  content: '▲';
+}
+
+th.sortable.sort-desc::after {
+  content: '▼';
+}

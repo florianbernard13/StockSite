@@ -41,9 +41,9 @@
 # ]
 
 CAC40_COMPANIES = [
-{"name": "AB Science", "ticker": "AB.PA"},
-{"name": "ABC Arbitrage", "ticker": "ABCA.PA"},
 {"name": "Accor", "ticker": "AC.PA"},
+{"name": "AB Science", "ticker": "AB.PA"},  
+{"name": "ABC Arbitrage", "ticker": "ABCA.PA"},
 {"name": "Adocia", "ticker": "ADOC.PA"},
 {"name": "ADP (Aéroports de Paris)", "ticker": "ADP.PA"},
 {"name": "Air France – KLM", "ticker": "AF.PA"},

@@ -1,12 +1,13 @@
 import LinearRegressionAnalyzer from './linearRegressionAnalyzer';
 import GrowthEvolutionAnalyzer from './growthEvolutionAnalyzer';
 import { AnalysisResult } from '../../types';
-import AbstractButton from '../buttons/abstractButton'; 
 
 export default class AnalysisDashboard {
     private endpoint: string;
     private analyzers: (LinearRegressionAnalyzer | GrowthEvolutionAnalyzer)[];
-    private analyzeButton: AbstractButton;
+    private results: AnalysisResult[] = [];
+    private sortKey: string | null = null;
+    private sortDir: 'asc' | 'desc' = 'asc'
 
     constructor(endpoint: string = '/data_analyzers/analysis_dispatcher') {
         this.endpoint = endpoint;
@@ -17,7 +18,7 @@ export default class AnalysisDashboard {
         this.bindEvents();
     }
 
-    private bindEvents(button: AbstractButton): void {
+    private bindEvents(): void {
         const btn = document.getElementById('analyze-all-btn');
         if (btn) btn.addEventListener('click', () => this.analyzeAll());
     }
@@ -67,7 +68,17 @@ export default class AnalysisDashboard {
         tickerTh.textContent = 'Ticker';
         row.appendChild(tickerTh);
 
-        this.analyzers.forEach(analyzer => analyzer.addHeaderColumn(row));
+        this.analyzers.forEach(analyzer => {
+            const th = analyzer.addHeaderColumn(row);
+
+            if ('getSortValue' in analyzer) {
+                th.classList.add('sortable');
+                th.dataset.sortKey = analyzer.type;
+                th.addEventListener('click', () => {
+                    this.toggleSort(analyzer.type);
+                });
+            }
+        });
 
         thead.appendChild(row);
     }
@@ -75,7 +86,7 @@ export default class AnalysisDashboard {
     public async analyzeAll(): Promise<void> {
         const analyses = this.analyzers.map(a => a.type);
 
-        this.clearTable();
+        this.createHeader();
 
         try {
             const res = await fetch(this.endpoint, {
@@ -100,10 +111,8 @@ export default class AnalysisDashboard {
                 return;
             }
 
-            results.sort(this._sortErrorsToEnd);
-
-            this.createHeader();
-            this.createRows(results);
+            this.results = results.sort(this._sortErrorsToEnd);
+            this.render();
 
             results.forEach(item => {
                 this.analyzers.forEach(analyzer => analyzer.populateCell(item));
@@ -115,6 +124,59 @@ export default class AnalysisDashboard {
                 tbody.innerHTML = `<tr><td colspan="${this.analyzers.length + 1}" class="sigma--error">Erreur réseau lors du chargement.</td></tr>`;
             }
         }
+    }
+
+    private render(): void {
+        this.clearTable();
+        this.createRows(this.getSortedResults());
+
+        this.results.forEach(item => {
+            this.analyzers.forEach(analyzer => analyzer.populateCell(item));
+        });
+    }
+
+    private getSortedResults(): AnalysisResult[] {
+        if (!this.sortKey) return this.results;
+
+        const analyzer = this.analyzers.find(a => a.type === this.sortKey);
+        if (!analyzer?.getSortValue) return this.results;
+
+        const factor = this.sortDir === 'asc' ? 1 : -1;
+
+        return [...this.results].sort((a, b) => {
+            const va = analyzer.getSortValue!(a);
+            const vb = analyzer.getSortValue!(b);
+
+            if (va == null && vb == null) return 0;
+            if (va == null) return 1;
+            if (vb == null) return -1;
+
+            if (typeof va === 'number' && typeof vb === 'number') {
+                return (va - vb) * factor;
+            }
+
+            return String(va).localeCompare(String(vb)) * factor;
+        });
+    }
+
+    private toggleSort(key: string): void {
+        if (this.sortKey === key) {
+            this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortKey = key;
+            this.sortDir = 'asc';
+        }
+        this.updateSortIndicators();
+        this.render();
+    }
+
+    private updateSortIndicators(): void {
+        document.querySelectorAll<HTMLTableCellElement>('.stock-table th.sortable').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.dataset.sortKey === this.sortKey) {
+                th.classList.add(this.sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
     }
 
     private _sortErrorsToEnd(a: AnalysisResult, b: AnalysisResult): number {
