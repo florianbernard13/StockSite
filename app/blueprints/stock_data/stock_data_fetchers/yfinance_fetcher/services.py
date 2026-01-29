@@ -1,4 +1,3 @@
-from shlex import quote
 import pandas as pd
 from app.blueprints.stock_data.stock_data_fetchers.base_fetcher import BaseFetcher
 from app.blueprints.stock_data.yfinance_wrapper.safe_ticker import SafeTicker
@@ -58,6 +57,7 @@ class YfinanceFetcher(BaseFetcher):
 
             quote = quote_builder.build()
             self.quote_repository.save(quote)
+            print(self.quote_repository)
 
             self.stock_cache[symbol] = {
                 "symbol": symbol,
@@ -88,3 +88,5 @@ class YfinanceFetcher(BaseFetcher):
     def convert_and_add_price_many(yfinance_dataframe: pd.DataFrame, quote_builder: QuoteBuilder):
         converted_yfinance_dataframe = PriceSeriesAdapter.from_yfinance(yfinance_dataframe)
         quote_builder.add_price_many(converted_yfinance_dataframe)
+
+    

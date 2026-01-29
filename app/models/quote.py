@@ -28,7 +28,7 @@ class Quote:
         return Quote(
             symbol=self.symbol,
             name=self.name,
-            prices=self.price_series.merge(prices)
+            price_series=self.price_series.merge(prices)
         )
     
     def get_prices_between(self, start: datetime | None = None, end: datetime | None = None) -> PriceSeries:

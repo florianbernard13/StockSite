@@ -1,7 +1,7 @@
-from app.blueprints.stock_data.stock_data_fetchers.shared_fetcher import shared_stock_data_fetcher
 from app.blueprints.data_analyzers.linear_regressions.standard_deviation.services import LinearRegressionWithStdDeviationAnalyzer
 from app.blueprints.data_analyzers.growth_evolutions.services import GrowthEvolutionAnalyzer
 from app.blueprints.data_analyzers.interfaces.base_analyzer import BaseAnalyzer
+from app.blueprints.stock_data.stock_data_fetchers.fetcher_dispatcher import fetcherDispatcher
 from app.blueprints.stock_data.configs.cac40 import CAC40_COMPANIES
 from app.blueprints.data_analyzers.analyzer_registry import ANALYZERS_REGISTRY
 import logging
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class AnalysisDispatcher:
     def __init__(self, analyses_names: list[str] = None, stocks_list=None):
-        self.stock_data_fetcher = shared_stock_data_fetcher
+        self.stock_data_fetcher = fetcherDispatcher()
         self.stocks_list = stocks_list if stocks_list else CAC40_COMPANIES
         
         self.analyzers = []

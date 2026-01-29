@@ -41,6 +41,9 @@ class PriceSeries:
         self_start, self_end = self.prices[0][0], self.prices[-1][0]
         other_start, other_end = other.prices[0][0], other.prices[-1][0]
 
+        print(self_start, self_end )
+        print(other_start, other_end)
+
         # Cas prepend total (other entirely before self)
         if other_end < self_start:
             return PriceSeries(other.prices.extend(self.prices))

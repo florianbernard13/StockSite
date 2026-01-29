@@ -1,9 +1,10 @@
+import datetime
 from flask import request, jsonify
-from ..shared_fetcher import shared_stock_data_fetcher
+from app.blueprints.stock_data.stock_data_fetchers.fetcher_dispatcher import fetcherDispatcher
+from datetime import datetime
 from . import yfinance_fetcher_bp
 
-stock_service = shared_stock_data_fetcher
-
+fetcher_dispatcher = fetcherDispatcher()
 
 @yfinance_fetcher_bp.route("/stock_data")
 def get_stock_data():
@@ -16,7 +17,7 @@ def get_stock_data():
         return jsonify({"error": "Missing required parameter 'symbol'"}), 404
 
     # Appel de la méthode pour récupérer les données avec la période maximale
-    data = stock_service.get_stock_data_for_period(symbol, "max")
+    data = fetcher_dispatcher.get_stock_data_for_period(symbol, "max")
 
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
@@ -46,7 +47,7 @@ def get_stock_data_last_period(period):
         return jsonify({"error": "Unité de période invalide (d, m, y)"}), 400
 
     # Appelle ta méthode de récupération des données (à adapter)
-    data = stock_service.get_stock_data_for_period(symbol, period)
+    data = fetcher_dispatcher.get_stock_data_for_period(symbol, period)
 
     if not data:
         return jsonify({"error": "Données non disponibles"}), 404
@@ -66,13 +67,14 @@ def get_realtime_stock_data():
     """
     symbol = request.args.get("symbol", "AAPL").upper()
 
-    data = stock_service.fetch_stock_data(symbol)
-    if not data:
+    quote = fetcher_dispatcher.real_time(symbol)
+    if not quote:
         return jsonify({"error": f"Impossible de récupérer les données pour {symbol}"}), 404
-    realtime_info = {
-        "symbol": data["symbol"],
-        "shortName": data["shortName"],
-        "price": data["price"],
-    }
+    
+    print(quote.get_prices_between(start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).to_json())
 
-    return jsonify(realtime_info), 200
+    return jsonify({
+        "symbol": quote.symbol,
+        "shortName": quote.name,
+        "history": quote.get_prices_between(start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).to_json(),
+    }), 200
