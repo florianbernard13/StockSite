@@ -229,4 +229,5 @@ CAC40_COMPANIES = [
 {"name": "Wallix", "ticker": "ALLIX.PA"},
 {"name": "Parrot", "ticker": "PARRO.PA"},
 {"name": "Lighton", "ticker": "ALTAI.PA"},
+{"name": "Exosens", "ticker": "EXENS.PA"},
 ]

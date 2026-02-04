@@ -1,21 +1,22 @@
 from datetime import datetime
 from dataclasses import dataclass
 from pyrsistent import pvector
-from typing import TypeAlias
+from typing import TypeAlias, Union
 
 PricePoint: TypeAlias = tuple[datetime, float]
+TimestampLike = Union[datetime, str]
 
 @dataclass(frozen=True)
 class PriceSeries:
-    prices: "pvector[tuple[datetime, float]]"
-
+    prices: "pvector[PricePoint]"
+    
     @classmethod
     def empty(cls) -> PriceSeries:
         return cls(pvector())
 
-    def add(self, date: datetime, price: float) -> PriceSeries:
+    def add(self, date: str, price: float) -> PriceSeries:
         if self.prices:
-            last_date = self.prices[-1][0]
+            last_date, _ = self.prices[-1]
             if date < last_date:
                 raise ValueError("PriceSeries.add expects non-decreasing dates")
             if date == last_date:
@@ -31,55 +32,52 @@ class PriceSeries:
     def all_prices(self) -> list[PricePoint]:
         return list(self.prices)
     
-    def merge(self, other: PriceSeries) -> PriceSeries:
+    def merge(self, other: "PriceSeries") -> "PriceSeries":
         if not self.prices:
             return other
         if not other.prices:
             return self
 
-        # dates de début / fin
-        self_start, self_end = self.prices[0][0], self.prices[-1][0]
-        other_start, other_end = other.prices[0][0], other.prices[-1][0]
+        merged = []
+        i, j = 0, 0
+        n, m = len(self.prices), len(other.prices)
 
-        print(self_start, self_end )
-        print(other_start, other_end)
+        while i < n and j < m:
+            self_ts, self_price = self.prices[i]
+            other_ts, other_price = other.prices[j]
 
-        # Cas prepend total (other entirely before self)
-        if other_end < self_start:
-            return PriceSeries(other.prices.extend(self.prices))
+            if self_ts < other_ts:
+                merged.append((self_ts, self_price))
+                i += 1
+            elif self_ts > other_ts:
+                merged.append((other_ts, other_price))
+                j += 1
+            else:
+                # égalité de timestamps : on prend 'other'
+                merged.append((other_ts, other_price))
+                i += 1
+                j += 1
 
-        # Cas append total (other entirely after self)
-        if other_start > self_end:
-            return PriceSeries(self.prices.extend(other.prices))
+        # ajouter le reste
+        while i < n:
+            merged.append(self.prices[i])
+            i += 1
+        while j < m:
+            merged.append(other.prices[j])
+            j += 1
 
-        # Cas chevauchement partiel / overwrite
-        # garder self avant le début de other
-        cut_index = 0
-        for i, (date, _) in enumerate(self.prices):
-            if date >= other_start:
-                cut_index = i
-                break
-
-        merged = self.prices[:cut_index].extend(other.prices)
-        return PriceSeries(merged)
+        return PriceSeries(pvector(merged))
     
-    def slice(self, start: datetime | None = None, end: datetime | None = None) -> PriceSeries:
-        # rendre start et end naïfs
-        if start is not None:
-            start = start.replace(tzinfo=None)
-        if end is not None:
-            end = end.replace(tzinfo=None)
-
+    def slice(self, start: str | None = None, end: str | None = None) -> PriceSeries:
+        print(self.prices)
+        print(start)
+        print(end)
         filtered = [
-            (d.replace(tzinfo=None), p)  # rendre chaque date naïve
-            for d, p in self.prices
-            if (start is None or d.replace(tzinfo=None) >= start) and
-            (end is None or d.replace(tzinfo=None) <= end)
+            (date, price)
+            for date, price in self.prices
+            if (start is None or date >= start) and (end is None or date <= end)
         ]
         return PriceSeries(pvector(filtered))
     
     def to_json(self):
-        return [
-            {"Datetime": dt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S"), "Close": price}
-            for dt, price in self.prices
-        ]
+        return [{"Datetime": ts, "Close": price} for ts, price in self.prices]

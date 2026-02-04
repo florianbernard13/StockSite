@@ -71,18 +71,6 @@ class YfinanceFetcher(BaseFetcher):
         except Exception:
             logger.exception("Failed to fetch stock data for symbol=%r", symbol)
             return None
-
-    def format_history_json(self, df):
-        """
-        Transforme un DataFrame indexé par datetime en une liste de dictionnaires.
-        Chaque dictionnaire contient "Datetime" (format 'YYYY-MM-DD HH:MM:SS') et "Close".
-        """
-        df = df.copy()
-        # Supprimer le fuseau horaire
-        df.index = df.index.tz_localize(None)
-        df.loc[:, "Datetime"] = df.index
-        df.loc[:, "Datetime"] = df["Datetime"].dt.strftime('%Y-%m-%d %H:%M:%S')
-        return df.loc[:, ["Datetime", "Close"]].to_dict(orient="records")
     
     @staticmethod
     def convert_and_add_price_many(yfinance_dataframe: pd.DataFrame, quote_builder: QuoteBuilder):

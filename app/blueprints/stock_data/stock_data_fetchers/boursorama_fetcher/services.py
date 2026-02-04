@@ -15,7 +15,6 @@ class BoursoramaFetcher(BaseFetcher):
         real_time_price_series = self.parse(response)
         quote = self.quote_repository.get(symbol)
         quote.add_price_many(real_time_price_series)
-        print(quote.list_all_prices)
     
     @staticmethod
     def generate_boursorama_symbol(symbol: str) -> str:
