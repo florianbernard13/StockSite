@@ -69,9 +69,6 @@ class PriceSeries:
         return PriceSeries(pvector(merged))
     
     def slice(self, start: str | None = None, end: str | None = None) -> PriceSeries:
-        print(self.prices)
-        print(start)
-        print(end)
         filtered = [
             (date, price)
             for date, price in self.prices

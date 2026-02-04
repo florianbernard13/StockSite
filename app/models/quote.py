@@ -31,5 +31,5 @@ class Quote:
             price_series=self.price_series.merge(prices)
         )
     
-    def get_prices_between(self, start: datetime | None = None, end: datetime | None = None) -> PriceSeries:
+    def get_prices_between(self, start: str | None = None, end: str | None = None) -> PriceSeries:
         return self.price_series.slice(start=start, end=end)

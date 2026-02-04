@@ -70,11 +70,15 @@ def get_realtime_stock_data():
     quote = fetcher_dispatcher.real_time(symbol)
     if not quote:
         return jsonify({"error": f"Impossible de récupérer les données pour {symbol}"}), 404
-    
-    print(quote.get_prices_between(start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).to_json())
+
+    # convertir le datetime en string homogène
+    start_ts_str = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H:%M:%S")
+
+    history_series = quote.get_prices_between(start=start_ts_str)
 
     return jsonify({
         "symbol": quote.symbol,
         "shortName": quote.name,
-        "history": quote.get_prices_between(start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)).to_json(),
+        "price": quote.current_price,
+        "history": history_series.to_json() if history_series else [],
     }), 200

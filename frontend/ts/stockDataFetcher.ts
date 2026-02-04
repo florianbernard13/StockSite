@@ -196,25 +196,23 @@ export default class StockDataFetcher {
             throw new Error("Erreur réseau : " + response.status);
         }
 
-        const data = await response.json();
+        const data : StockData = await response.json();
 
-        if (!data || !data.price || !data.datetime) {
+        if (!data || !data.price || !data.history) {
             console.warn("Données temps réel invalides :", data);
             return;
         }
 
         const chart = this.getChart();
-        if (!chart) {
-            console.warn("Aucun graphique initialisé pour la mise à jour temps réel.");
-            return;
-        }
+        const priceData: [number, number][] = data.history.map(item => [
+            Date.parse(item.Datetime),
+            item.Close
+        ]);
 
-        const newPoint = [Date.parse(data.datetime), data.price];
-        const series = chart.series[0];
-        series.addPoint(newPoint, true, false);
+        const series = chart!.series[0];
+        series.setData(priceData, true);
 
-        chart.setTitle({ text: `${data.shortName} (${data.symbol}) - ${data.price.toFixed(2)} USD` });
-        console.log("Point temps réel ajouté :", newPoint);
+        console.log("Graphique temps réel mis à jour avec toutes les données :", priceData.length);
 
         } catch (err) {
             console.error("Erreur lors de la récupération des données temps réel :", err);

@@ -40,10 +40,10 @@ class BoursoramaFetcher(BaseFetcher):
 
         quote_tab = raw.get("d", {}).get("QuoteTab", [])
         for point in quote_tab:
-            dt, price = self.parse_price_point(point)
-            series = series.add(dt, price)
+            date, price = self.parse_price_point(point)
+            series = series.add(date, price)
 
-        return series
+        return series   
 
     @staticmethod
     def parse_price_point(raw: dict) -> tuple[datetime, float]:
@@ -55,6 +55,7 @@ class BoursoramaFetcher(BaseFetcher):
         date = datetime.strptime(date_part, "%y%m%d")
         dt = date + timedelta(minutes=minutes_in_day)
 
+        ts_str = dt.strftime("%Y-%m-%d %H:%M:%S")
         price = raw["c"]
 
-        return dt, price 
+        return ts_str, price 

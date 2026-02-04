@@ -57,7 +57,6 @@ class YfinanceFetcher(BaseFetcher):
 
             quote = quote_builder.build()
             self.quote_repository.save(quote)
-            print(self.quote_repository)
 
             self.stock_cache[symbol] = {
                 "symbol": symbol,
