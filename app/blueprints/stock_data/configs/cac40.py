@@ -169,7 +169,6 @@ CAC40_COMPANIES = [
 {"name": "Prologue", "ticker": "ALPRG.PA"},
 {"name": "Publicis Groupe", "ticker": "PUB.PA"},
 {"name": "Quadient", "ticker": "QDT.PA"},
-{"name": "Rallye", "ticker": "RAL.PA"},
 {"name": "Ramsay Générale", "ticker": "RMS.PA"},
 {"name": "Rémy Cointreau", "ticker": "RCO.PA"},
 {"name": "Renault", "ticker": "RNO.PA"},
@@ -230,4 +229,5 @@ CAC40_COMPANIES = [
 {"name": "Parrot", "ticker": "PARRO.PA"},
 {"name": "Lighton", "ticker": "ALTAI.PA"},
 {"name": "Exosens", "ticker": "EXENS.PA"},
+{"name": "Logic Instrument", "ticker": "ALLOG.PA"},
 ]

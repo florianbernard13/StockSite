@@ -22,30 +22,15 @@ class PriceSeriesSlicer:
             logger.warning("No price series available for symbol=%r", quote.symbol)
             return None
 
-        if period_str == "max":
-            return price_series
-
         parsed = PriceSeriesSlicer.parse_period(period_str)
-        if parsed is None:
-            logger.warning("Invalid period format %r", period_str)
-            return None
-
-        amount, unit = parsed
-        cutoff_date = PriceSeriesSlicer.get_cutoff_date(amount, unit)
-
-        if cutoff_date is None:
-            return None
-
-        sliced = price_series.slice(start=cutoff_date)
-
-        if not sliced.prices:
-            return None
-
-        parsed = PriceSeriesSlicer.parse_period(period_str)
-        if parsed is None:
-            return "1d"
-        num, unit = parsed
-        freq = PriceSeriesSlicer.get_resample_freq_from_parsed(num, unit)
+        if parsed is None or parsed == "max":
+            freq = "1d"
+            sliced = quote.price_series
+        else:
+            num, unit = parsed
+            cutoff_date = PriceSeriesSlicer.get_cutoff_date(num, unit)
+            sliced = price_series.slice(start=cutoff_date)
+            freq = PriceSeriesSlicer.get_resample_freq_from_parsed(num, unit)
 
         return PriceSeriesSlicer.resample_series(sliced, freq=freq)
 

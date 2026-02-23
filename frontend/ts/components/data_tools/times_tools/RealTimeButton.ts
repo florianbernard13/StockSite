@@ -1,6 +1,7 @@
 import AbstractButton from "../../buttons/abstractButton";
 import StockDataFetcher from "../../../stockDataFetcher";
 import MutuallyExclusiveButtonGroup from "../../mutuallyExclusiveButtonGroup";
+import StockStore from "../../../stores/stockStore";
 
 export default class RealTimeButton extends AbstractButton {
     stockDataFetcher;
@@ -20,6 +21,11 @@ export default class RealTimeButton extends AbstractButton {
 
     protected onActivate() {
         this.fetchRealTimeData();
+        StockStore.setTimeSpan("REALTIME")
+    }
+
+    protected onDeactivate(): void {
+        StockStore.setTimeSpan(null);
     }
 
     async fetchRealTimeData() {
