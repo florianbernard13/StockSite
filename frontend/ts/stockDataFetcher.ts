@@ -1,6 +1,7 @@
 import StockStore from "./stores/stockStore";
 import Highcharts, { Chart } from "highcharts/highstock";
 import AccessibilityModule from "highcharts/modules/accessibility";
+import StockDataService from "./stockDataService";
 import { StockEvent, StockData } from "./types";
 
 AccessibilityModule(Highcharts);
@@ -16,19 +17,15 @@ export default class StockDataFetcher {
 
     private symbol: string | null;
     private timeSpan: string | null;
+    private dataService = new StockDataService();
     
     constructor(defaultSymbol?: string) {
         this.symbol = defaultSymbol || null;
         this.timeSpan = null;
         StockStore.onUpdate((stock: StockEvent) => {
             if (this.symbol === stock.symbol && this.timeSpan === StockStore.getTimeSpan()) return;
-            if(StockStore.getTimeSpan() === "REALTIME"){
-                this.timeSpan = StockStore.getTimeSpan();
-                return;
-            }
             this.symbol = stock.symbol;
             this.timeSpan = StockStore.getTimeSpan();       
-            console.log("Mise à jour détectée :", stock);
             this.LoadChart(stock);
         });
     }
@@ -206,24 +203,20 @@ export default class StockDataFetcher {
         const { min, max } = this.calculateYAxisExtremes(priceData, timeSpan);
         (chart.yAxis[0] as any).setExtremes(min, max, false);
 
+        if (timeSpan === "REALTIME") {
+            const openPrice = priceData[0][1];
+            this.updateRealtimeOpenLine(openPrice);
+        } else {
+            chart.yAxis[0].removePlotLine("open-line");
+        }
+
         chart.redraw();
     }
 
-    async LoadChart(stock: StockEvent): Promise<void>  {
-        const apiUri = StockStore.getApiUri();
-        const symbolParam = (apiUri.includes("?") ? "&" : "?") + "symbol=" + stock.symbol;
+    async LoadChart(stock: StockEvent): Promise<void>  {    
 
         try {
-            const response = await fetch("/api" + apiUri + symbolParam, {
-                method: "GET",
-                cache: "no-store"
-            });
-
-            if (!response.ok) {
-                throw new Error("Erreur réseau : " + response.status);
-            }
-
-            const data = await response.json();
+            const data = await this.dataService.fetch(stock.symbol);
 
             if (data.shortName !== stock.shortName) {
                 //Le nom a déjà été poussé et va trigger la récupération des données qui retriger la notification
@@ -241,43 +234,13 @@ export default class StockDataFetcher {
                 this.updateTitle(data)
                 this.resetXAxis();
             }
+
+            if (this.timeSpan === "REALTIME") {
+                const openPrice = data.history[0].Close;
+                this.updateRealtimeOpenLine(openPrice);
+            }
         } catch (err) {
             console.error("Erreur de chargement du graphique :", err);
-        }
-    }
-
-    async fetchRealTimeData(): Promise<void> {
-        if (!this.symbol) return;
-
-        try {
-            const response = await fetch(`/api/stock_data/realtime?symbol=${this.symbol}`, {
-                method: "GET",
-                cache: "no-store"
-            });
-        
-        if (!response.ok) {
-            throw new Error("Erreur réseau : " + response.status);
-        }
-
-        const data : StockData = await response.json();
-
-        const priceData: [number, number][] = this.buildPriceData(data);
-
-        if (!this.getChart()) {
-            const { min, max } = this.calculateYAxisExtremes(priceData, this.timeSpan);
-            const chart = this.createChart(data, priceData, min, max);
-            this.setChart(chart);
-        } else {
-            this.updateChartData(priceData, this.timeSpan);
-        }
-
-        const openPrice = data.history[0].Close;
-        this.updateRealtimeOpenLine(openPrice);
-
-        console.log("Graphique temps réel mis à jour avec toutes les données :", priceData.length);
-
-        } catch (err) {
-            console.error("Erreur lors de la récupération des données temps réel :", err);
         }
     }
 }

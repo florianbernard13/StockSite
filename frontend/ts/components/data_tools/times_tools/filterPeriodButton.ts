@@ -3,8 +3,6 @@ import AbstractButton from "../../buttons/abstractButton";
 import StockStore from "../../../stores/stockStore";
 
 export default class FilterPeriodButton extends AbstractButton {
-    value: number;
-    unit: string;
 
     /**
      * Crée un bouton de filtre de période.
@@ -13,8 +11,8 @@ export default class FilterPeriodButton extends AbstractButton {
      * @param mutuallyExclusiveGroup - Groupe mutuellement exclusif
      */
     constructor(
-        value: number = 5,
-        unit: "d" | "m" | "y" = "d",
+        public value: number = 5,
+        public unit: "d" | "m" | "y" = "d",
         mutuallyExclusiveGroup: MutuallyExclusiveButtonGroup | null = null
     ) {
         const key = `last${value}${unit.toUpperCase()}-btn`;

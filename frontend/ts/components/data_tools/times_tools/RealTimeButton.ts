@@ -4,13 +4,12 @@ import MutuallyExclusiveButtonGroup from "../../mutuallyExclusiveButtonGroup";
 import StockStore from "../../../stores/stockStore";
 
 export default class RealTimeButton extends AbstractButton {
-    stockDataFetcher;
 
     /**
      * @param stockDataFetcher - L'instance de StockDataFetcher à utiliser.
      */
     constructor(
-        stockDataFetcher: StockDataFetcher,
+        public stockDataFetcher: StockDataFetcher,
         mutuallyExclusiveGroup: MutuallyExclusiveButtonGroup | null = null) {
         super("realtime-btn", {
             mutuallyExclusive: true,
@@ -20,21 +19,10 @@ export default class RealTimeButton extends AbstractButton {
     }
 
     protected onActivate() {
-        this.fetchRealTimeData();
         StockStore.setTimeSpan("REALTIME")
     }
 
     protected onDeactivate(): void {
         StockStore.setTimeSpan(null);
-    }
-
-    async fetchRealTimeData() {
-        try {
-            console.log("Fetching real-time data...");
-            const data = await this.stockDataFetcher.fetchRealTimeData();
-            console.log("Real-time data received:", data);
-        } catch (error) {
-            console.error("Erreur lors de la récupération des données temps réel :", error);
-        }
     }
 }
