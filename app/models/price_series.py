@@ -4,7 +4,6 @@ from pyrsistent import pvector
 from typing import TypeAlias, Union
 
 PricePoint: TypeAlias = tuple[datetime, float]
-TimestampLike = Union[datetime, str]
 
 @dataclass(frozen=True)
 class PriceSeries:

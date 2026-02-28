@@ -15,8 +15,21 @@ services:
       - VITE_ENV=development
     command: /app/entrypoint.sh
 
-  # Service de la base de données (PostgreSQL pour SonarQube)
-  db:
+  # Service de la base de données de l'application
+  stock-db:
+    image: timescale/timescaledb:latest-pg17
+    container_name: stock_db
+    environment:
+      POSTGRES_USER: stock
+      POSTGRES_PASSWORD: stock
+      POSTGRES_DB: stock
+    ports:
+      - "5433:5432"
+    volumes:
+      - stock_db_data:/var/lib/postgresql/data
+
+  # Service de la base de données SonarQube
+  sonardb:
     image: postgres:13
     container_name: sonarqube_db
     environment:
@@ -33,11 +46,11 @@ services:
     ports:
       - "9000:9000"
     environment:
-      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_URL: jdbc:postgresql://sonardb:5432/sonar
       SONAR_JDBC_USERNAME: sonar
       SONAR_JDBC_PASSWORD: sonar
     depends_on:
-      - db
+      - sonardb
     volumes:
       - sonar_data:/opt/sonarqube/data
       - sonar_extensions:/opt/sonarqube/extensions
@@ -47,3 +60,4 @@ volumes:
   sonar_db_data:
   sonar_data:
   sonar_extensions:
+  stock_db_data:
