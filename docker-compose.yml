@@ -3,16 +3,10 @@ services:
   flask-app:
     build: .
     ports:
-      - "5000:5000"
-      - "5173:5173"
+      - "${APP_PORT}:${APP_PORT}"
+      - "${VITE_PORT}:${VITE_PORT}"
     volumes:
       - .:/app
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_RUN_HOST=0.0.0.0  
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
-      - VITE_ENV=development
     command: /app/entrypoint.sh
 
   # Service de la base de données de l'application
@@ -20,11 +14,11 @@ services:
     image: timescale/timescaledb:latest-pg17
     container_name: stock_db
     environment:
-      POSTGRES_USER: stock
-      POSTGRES_PASSWORD: stock
-      POSTGRES_DB: stock
+      POSTGRES_USER: ${STOCK_DB_USER}
+      POSTGRES_PASSWORD: ${STOCK_DB_PASSWORD}
+      POSTGRES_DB: ${STOCK_DB_NAME}
     ports:
-      - "5433:5432"
+      - "5433:${STOCK_DB_PORT}"
     volumes:
       - stock_db_data:/var/lib/postgresql/data
 
@@ -33,9 +27,9 @@ services:
     image: postgres:13
     container_name: sonarqube_db
     environment:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
-      POSTGRES_DB: sonar
+      POSTGRES_USER: ${SONAR_DB_USER}
+      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD}
+      POSTGRES_DB: ${SONAR_DB_NAME}
     volumes:
       - sonar_db_data:/var/lib/postgresql/data
 
@@ -46,9 +40,9 @@ services:
     ports:
       - "9000:9000"
     environment:
-      SONAR_JDBC_URL: jdbc:postgresql://sonardb:5432/sonar
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_URL: ${SONARQUBE_JDBC_URL}
+      SONAR_JDBC_USERNAME: ${SONARQUBE_JDBC_USERNAME}
+      SONAR_JDBC_PASSWORD: ${SONARQUBE_JDBC_PASSWORD}
     depends_on:
       - sonardb
     volumes:
